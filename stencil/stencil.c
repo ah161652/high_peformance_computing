@@ -11,7 +11,7 @@ void init_image(const int nx, const int ny, const int width, const int height,
                 float* image, float* tmp_image);
 void output_image(const char* file_name, const int nx, const int ny,
                   const int width, const int height, float* image);
-float wtime(void);
+double wtime(void);
 
 int main(int argc, char* argv[])
 {
