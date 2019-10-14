@@ -1,3 +1,6 @@
+rm stencil
+rm stencil.out
+rm stencil.pgm
 gcc -std=c99 -Wall stencil.c -o stencil
 sbatch stencil.job
 sleep 10

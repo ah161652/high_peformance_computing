@@ -1,3 +1,6 @@
+rm stencil
+rm stencil.out
+rm stencil.pgm
 icc stencil.c -o stencil
 sbatch stencil.job
 sleep 10
