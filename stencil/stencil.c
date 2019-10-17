@@ -60,7 +60,7 @@ void stencil(const int nx, const int ny, const int width, const int height,
              double* image, double* tmp_image)
 {
   int calc = 3.0/5.0;
-  into calc2 = 0.5/5.0;
+  int calc2 = 0.5/5.0;
   for (int j = 1; j < ny + 1; j++) {
     for (int i = 1; i < nx + 1; i++) {
 
