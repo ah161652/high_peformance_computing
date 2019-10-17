@@ -113,7 +113,7 @@ void output_image(const char* file_name, const int nx, const int ny,
   if (!fp) {
     fprintf(stderr, "Error: Could not open %s\n", OUTPUT_FILE);
     exit(EXIT_FAILURE);
-  }nt i = 1; i < ny + 1; +
+  }
 
   // Ouptut image header
   fprintf(fp, "P5 %d %d 255\n", nx, ny);
