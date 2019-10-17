@@ -1,0 +1,11 @@
+Running on host compute085.bc4.acrc.priv
+Time is Thu Oct 17 11:16:29 BST 2019
+Directory is /mnt/storage/home/ah16165/high_peformance_computing/stencil
+Slurm job ID is 2549222
+
+This job runs on the following machines:
+compute085
+
+------------------------------------
+ runtime: 0.632515 s
+------------------------------------
