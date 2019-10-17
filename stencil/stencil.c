@@ -59,15 +59,20 @@ int main(int argc, char* argv[])
 void stencil(const int nx, const int ny, const int width, const int height,
              double* image, double* tmp_image)
 {
-  for (int j = 1; j < ny + 1; ++j) {
-    for (int i = 1; i < nx + 1; ++i) {
-      tmp_image[j + i * height] =  image[j     + i       * height] * 3.0 / 5.0;
-      tmp_image[j + i * height] += image[j     + (i - 1) * height] * 0.5 / 5.0;
-      tmp_image[j + i * height] += image[j     + (i + 1) * height] * 0.5 / 5.0;
-      tmp_image[j + i * height] += image[j - 1 + i       * height] * 0.5 / 5.0;
-      tmp_image[j + i * height] += image[j + 1 + i       * height] * 0.5 / 5.0;
+  for (int j = 1; j < ny + 1; j+= 2) {
+    for (int i = 1; i < nx + 1; i+=2) {
+      for(jj =j; jj<j+2; ++jj){
+        for(ii =i; ii<i+2; ++ii){
+
+      tmp_image[jj + ii * height] =  image[jj     + ii       * height] * 3.0 / 5.0;
+      tmp_image[jj + ii * height] += image[jj     + (ii - 1) * height] * 0.5 / 5.0;
+      tmp_image[jj + ii * height] += image[jj     + (ii + 1) * height] * 0.5 / 5.0;
+      tmp_image[jj + ii * height] += image[jj - 1 + ii       * height] * 0.5 / 5.0;
+      tmp_image[jj + ii * height] += image[jj + 1 + ii       * height] * 0.5 / 5.0;
     }
   }
+}
+}
 }
 
 // Create the input image
@@ -108,7 +113,7 @@ void output_image(const char* file_name, const int nx, const int ny,
   if (!fp) {
     fprintf(stderr, "Error: Could not open %s\n", OUTPUT_FILE);
     exit(EXIT_FAILURE);
-  }
+  }nt i = 1; i < ny + 1; +
 
   // Ouptut image header
   fprintf(fp, "P5 %d %d 255\n", nx, ny);
