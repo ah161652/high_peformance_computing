@@ -59,21 +59,21 @@ int main(int argc, char* argv[])
 void stencil(const int nx, const int ny, const int width, const int height,
              double* image, double* tmp_image)
 {
-  for (int j = 1; j < ny + 1; j+= 2) {
-    for (int i = 1; i < nx + 1; i+=2) {
-      for(int jj =j; jj<j+2; ++jj){
-        for(int ii =i; ii<i+2; ++ii){
+  int calc = 3.0/5.0;
+  into calc2 = 0.5/5.0;
+  for (int j = 1; j < ny + 1; j++) {
+    for (int i = 1; i < nx + 1; i++) {
 
-      tmp_image[jj + ii * height] =  image[jj     + ii       * height] * 3.0 / 5.0;
-      tmp_image[jj + ii * height] += image[jj     + (ii - 1) * height] * 0.5 / 5.0;
-      tmp_image[jj + ii * height] += image[jj     + (ii + 1) * height] * 0.5 / 5.0;
-      tmp_image[jj + ii * height] += image[jj - 1 + ii       * height] * 0.5 / 5.0;
-      tmp_image[jj + ii * height] += image[jj + 1 + ii       * height] * 0.5 / 5.0;
+      tmp_image[jj + ii * height] =  image[jj     + ii       * height] * calc;
+      tmp_image[jj + ii * height] += image[jj     + (ii - 1) * height] * calc2;
+      tmp_image[jj + ii * height] += image[jj     + (ii + 1) * height] * calc2;
+      tmp_image[jj + ii * height] += image[jj - 1 + ii       * height] * calc2;
+      tmp_image[jj + ii * height] += image[jj + 1 + ii       * height] * calc2;
     }
   }
 }
-}
-}
+
+
 
 // Create the input image
 void init_image(const int nx, const int ny, const int width, const int height,
