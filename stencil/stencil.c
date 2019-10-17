@@ -61,8 +61,8 @@ void stencil(const int nx, const int ny, const int width, const int height,
 {
   for (int j = 1; j < ny + 1; j+= 2) {
     for (int i = 1; i < nx + 1; i+=2) {
-      for(jj =j; jj<j+2; ++jj){
-        for(ii =i; ii<i+2; ++ii){
+      for(int jj =j; jj<j+2; ++jj){
+        for(int ii =i; ii<i+2; ++ii){
 
       tmp_image[jj + ii * height] =  image[jj     + ii       * height] * 3.0 / 5.0;
       tmp_image[jj + ii * height] += image[jj     + (ii - 1) * height] * 0.5 / 5.0;
