@@ -6,12 +6,12 @@
 #define OUTPUT_FILE "stencil.pgm"
 
 void stencil(const int nx, const int ny, const int width, const int height,
-             double* image, double* tmp_image);
+             float* image, float* tmp_image);
 void init_image(const int nx, const int ny, const int width, const int height,
-                double* image, double* tmp_image);
+                float* image, float* tmp_image);
 void output_image(const char* file_name, const int nx, const int ny,
-                  const int width, const int height, double* image);
-double wtime(void);
+                  const int width, const int height, float* image);
+float wtime(void);
 
 int main(int argc, char* argv[])
 {
@@ -32,8 +32,8 @@ int main(int argc, char* argv[])
   int height = ny + 2;
 
   // Allocate the image
-  float* image = malloc(sizeof(double) * width * height);
-  float* tmp_image = malloc(sizeof(double) * width * height);
+  float* image = malloc(sizeof(float) * width * height);
+  float* tmp_image = malloc(sizeof(float) * width * height);
 
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
@@ -77,7 +77,7 @@ void stencil(const int nx, const int ny, const int width, const int height,
 
 // Create the input image
 void init_image(const int nx, const int ny, const int width, const int height,
-                double* image, double* tmp_image)
+                float* image, float* tmp_image)
 {
   // Zero everything
   for (int j = 0; j < ny + 2; ++j) {
@@ -106,7 +106,7 @@ void init_image(const int nx, const int ny, const int width, const int height,
 
 // Routine to output the image in Netpbm grayscale binary image format
 void output_image(const char* file_name, const int nx, const int ny,
-                  const int width, const int height, double* image)
+                  const int width, const int height, float* image)
 {
   // Open output file
   FILE* fp = fopen(file_name, "w");
@@ -121,7 +121,7 @@ void output_image(const char* file_name, const int nx, const int ny,
   // Calculate maximum value of image
   // This is used to rescale the values
   // to a range of 0-255 for output
-  double maximum = 0.0;
+  float maximum = 0.0;
   for (int j = 1; j < ny + 1; ++j) {
     for (int i = 1; i < nx + 1; ++i) {
       if (image[j + i * height] > maximum) maximum = image[j + i * height];
