@@ -32,8 +32,8 @@ int main(int argc, char* argv[])
   int height = ny + 2;
 
   // Allocate the image
-  double* image = malloc(sizeof(double) * width * height);
-  double* tmp_image = malloc(sizeof(double) * width * height);
+  float* image = malloc(sizeof(double) * width * height);
+  float* tmp_image = malloc(sizeof(double) * width * height);
 
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
@@ -57,10 +57,10 @@ int main(int argc, char* argv[])
 }
 
 void stencil(const int nx, const int ny, const int width, const int height,
-             double* image, double* tmp_image)
+             float* image, float* tmp_image)
 {
-  double calc = 3.0/5.0;
-  double calc2 = 0.5/5.0;
+  float calc = 3.0/5.0;
+  float calc2 = 0.5/5.0;
   for (int j = 1; j < ny + 1; ++j) {
     for (int i = 1; i < nx + 1; ++i) {
 
