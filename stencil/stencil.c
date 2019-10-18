@@ -23,17 +23,23 @@ int main(int argc, char* argv[])
 
   // Initiliase problem dimensions from command line arguments
   int nx = atoi(argv[1]);
+  long pad1[64];
   int ny = atoi(argv[2]);
+  long pad2[64];
   int niters = atoi(argv[3]);
 
   // we pad the outer edge of the image to avoid out of range address issues in
   // stencil
   int width = nx + 2;
+  long pad3[64];
   int height = ny + 2;
+  long pad4[64];
 
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
+  long pad5[64];
   float* tmp_image = malloc(sizeof(float) * width * height);
+  long pad6[64];
 
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
