@@ -145,7 +145,7 @@ void output_image(const char* file_name, const int nx, const int ny,
   fclose(fp);
 }
 
-// Get the current time in seconds since the Epoch
+// Get the current time in seconds since the Epoch.
 double wtime(void)
 {
   struct timeval tv;
