@@ -1,2 +1,2 @@
 stencil: stencil.c
-	gcc -std=c99 -Wall $^ -o $@
+	icc stencil.c -Ofast -fast -xHOST -qopt-report=1 -qopt-report-phase=vec -o stencil
