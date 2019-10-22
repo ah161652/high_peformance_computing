@@ -71,10 +71,10 @@ void stencil(const int nx, const int ny, const int width, const int height,
     for (int i = 1; i < nx + 1; ++i) {
 
       tmp_image[j + i * height] =  image[j     + i       * height] * calc;
-      tmp_image[j + i * height] += image[j     + (i - 1) * height] * calc2;
-      tmp_image[j + i * height] += image[j     + (i + 1) * height] * calc2;
-      tmp_image[j + i * height] += image[j - 1 + i       * height] * calc2;
-      tmp_image[j + i * height] += image[j + 1 + i       * height] * calc2;
+      tmp_image[j + i * height] += (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2);
+      // tmp_image[j + i * height] += image[j     + (i + 1) * height] * calc2;
+      // tmp_image[j + i * height] += image[j - 1 + i       * height] * calc2;
+      // tmp_image[j + i * height] += image[j + 1 + i       * height] * calc2;
     }
   }
 }
