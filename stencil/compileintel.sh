@@ -1,4 +1,3 @@
-##
 rm stencil
 rm stencil.out
 rm stencil.pgm

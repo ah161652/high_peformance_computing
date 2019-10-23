@@ -23,23 +23,17 @@ int main(int argc, char* argv[])
 
   // Initiliase problem dimensions from command line arguments
   int nx = atoi(argv[1]);
-  long pad1[512];
   int ny = atoi(argv[2]);
-  long pad2[512];
   int niters = atoi(argv[3]);
 
   // we pad the outer edge of the image to avoid out of range address issues in
   // stencil
   int width = nx + 2;
-  long pad3[512];
   int height = ny + 2;
-  long pad4[512];
 
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
-  long pad5[512];
   float* tmp_image = malloc(sizeof(float) * width * height);
-  long pad6 [512];
 
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
@@ -67,8 +61,8 @@ void stencil(const int nx, const int ny, const int width, const int height,
 {
   float calc = 3.0/5.0;
   float calc2 = 0.5/5.0;
-  for (int j = 1; j < ny + 1; ++j) {
-    for (int i = 1; i < nx + 1; ++i) {
+  for (int i = 1; i < ny + 1; ++i) {
+    for (int j = 1; j < nx + 1; ++j) {
 
       tmp_image[j + i * height] =  image[j     + i       * height] * calc;
       tmp_image[j + i * height] += (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2);
