@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <mpi.h>
+// #include <mpi.h>
 
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
@@ -17,17 +17,17 @@ double wtime(void);
 int main(int argc, char* argv[])
 {
   //MPI setup
-  MPI_Init(&argc, &argv);
-  int nprocs, rank, flag;
+  // MPI_Init(&argc, &argv);
+  // int nprocs, rank, flag;
 
   //Check if init worked
-  MPI_Initialized(&flag);
-  if ( flag != 1 ) {
-    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
-  }
-
-  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  // MPI_Initialized(&flag);
+  // if ( flag != 1 ) {
+  //   MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  // }
+  //
+  // MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+  // MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 
   // Check usage
@@ -41,9 +41,9 @@ int main(int argc, char* argv[])
   int ny = atoi(argv[2]);
   int niters = atoi(argv[3]);
 
-  int nx_work = nx/nprocs;
-  int start = rank * nx_work;
-  int end = start + nx_work;
+  // int nx_work = nx/nprocs;
+  // int start = rank * nx_work;
+  // int end = start + nx_work;
 
   // we pad the outer edge of the image to avoid out of range address issues in
   // stencil
@@ -60,8 +60,8 @@ int main(int argc, char* argv[])
   // Call the stencil kernel
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil(nx_work, ny, width, height, image, tmp_image);
-    stencil(nx_work, ny, width, height, tmp_image, image);
+    stencil(nx, ny, width, height, image, tmp_image);
+    stencil(nx, ny, width, height, tmp_image, image);
   }
   double toc = wtime();
 
