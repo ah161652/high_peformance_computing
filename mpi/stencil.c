@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-// #include <mpi.h>
+#include <mpi.h>
 
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
@@ -17,17 +17,17 @@ double wtime(void);
 int main(int argc, char* argv[])
 {
   //MPI setup
-  // MPI_Init(&argc, &argv);
-  // int nprocs, rank, flag;
+  MPI_Init(&argc, &argv);
+  int nprocs, rank, flag;
 
   //Check if init worked
-  // MPI_Initialized(&flag);
-  // if ( flag != 1 ) {
-  //   MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
-  // }
-  //
-  // MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-  // MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Initialized(&flag);
+  if ( flag != 1 ) {
+    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  }
+
+  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 
   // Check usage
