@@ -86,11 +86,11 @@ int main(int argc, char* argv[])
     MPI_COMM_WORLD);
 
     for (int i = 0; i < 50; i++) {
-      printf("%f \n", image[i]);
+      printf("%F \n", image[i]);
     }
     printf(" \n \n \n");
     for (int i = 0; i < 50; i++) {
-      printf("%f \n", final_image[i]);
+      printf("%F \n", final_image[i]);
     }
 
 
