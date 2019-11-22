@@ -76,11 +76,11 @@ int main(int argc, char* argv[])
     image,
     1,
     MPI_FLOAT,
-    final_images,
+    final_image,
     1,
     MPI_FLOAT,
     0,
-    MPI_COMM_WORLD)
+    MPI_COMM_WORLD);
 
   }
 
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
     1,
     MPI_FLOAT,
     0,
-    MPI_COMM_WORLD)
+    MPI_COMM_WORLD);
 
   }
 
