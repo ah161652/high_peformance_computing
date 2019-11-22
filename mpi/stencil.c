@@ -53,10 +53,10 @@ int main(int argc, char* argv[])
 
 
 
-  // Allocate the image
+  if(rank!=0){
   float* image = malloc(sizeof(float) * width * height);
   float* tmp_image = malloc(sizeof(float) * width * height);
-
+  }
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
 
