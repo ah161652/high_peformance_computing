@@ -66,33 +66,24 @@ int main(int argc, char* argv[])
   }
   double toc = wtime();
 
-  // stitch it back together
-  float* final_image = NULL;
-
-
-
-  if (rank == 0){
-  final_image = malloc(sizeof(float) * width * height);
+for (int i = 0; i < 10; i++) {
+  printf("%f\n",image[i] );
 }
+
+
+  // stitch it back together
+  float* final_image = malloc(sizeof(float) * width * height);
+
 
     MPI_Gather(
     image,
-    1,
+    (nx_work*ny),
     MPI_FLOAT,
     final_image,
-    1,
+    nx_work*ny,
     MPI_FLOAT,
     0,
     MPI_COMM_WORLD);
-
-    for (int i = 0; i < 50; i++) {
-      printf("%F \n", image[i]);
-    }
-    printf(" \n \n \n");
-    for (int i = 0; i < 50; i++) {
-      printf("%F \n", final_image[i]);
-    }
-
 
 
   // Output
