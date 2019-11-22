@@ -6,13 +6,14 @@
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
 
-void stencil(const int nx, const int ny, const int width, const int height,
-             float* image, float* tmp_image);
+void stencil(const int ny, const int width, const int height,
+             float* image, float* tmp_image, int startcol, int endcol);
 void init_image(const int nx, const int ny, const int width, const int height,
                 float* image, float* tmp_image);
 void output_image(const char* file_name, const int nx, const int ny,
                   const int width, const int height, float* image);
 double wtime(void);
+void halo(int rank, int nprocs, float* image, int startcol, int endcol, int working_cols)
 
 int main(int argc, char* argv[])
 {
@@ -41,15 +42,23 @@ int main(int argc, char* argv[])
   int ny = atoi(argv[2]);
   int niters = atoi(argv[3]);
 
-  // divide up work into columns
-   int nx_work = nx/(nprocs);
-   int start = (rank) * nx_work;
-   int end = start + nx_work;
-
   // we pad the outer edge of the image to avoid out of range address issues in
   // stencil
   int width = nx + 2;
   int height = ny + 2;
+
+  // divide up work into columns
+  int working_cols = nx/(nprocs);
+
+  //find starting col and ending col dependant on rank
+  int startcol = rank * working_cols;
+  if (rank == nprocs - 1) {
+        endcol = ny - 1;
+    }
+
+  else {
+        endcol = startcol + working_cols - 1;
+    }
 
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
@@ -61,29 +70,17 @@ int main(int argc, char* argv[])
   // Call the stencil kernel
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil(nx_work, ny, width, height, image, tmp_image);
-    stencil(nx_work, ny, width, height, tmp_image, image);
+    //halo(rank, nprocs, image, startcol, endcol, working_cols);
+    stencil(ny, width, height, image, tmp_image, startcol, endcol);
+    halo(rank, nprocs, tmp_image, startcol, endcol, working_cols);
+    stencil(ny, width, height, tmp_image, image, startcol, endcol);
   }
   double toc = wtime();
 
-for (int i = 0; i < 10; i++) {
-  printf("%f\n",image[i] );
-}
 
 
   // stitch it back together
   float* final_image = malloc(sizeof(float) * width * height);
-
-
-    MPI_Gather(
-    image,
-    (nx_work*ny),
-    MPI_FLOAT,
-    final_image,
-    nx_work*ny,
-    MPI_FLOAT,
-    0,
-    MPI_COMM_WORLD);
 
 
   // Output
@@ -99,19 +96,15 @@ for (int i = 0; i < 10; i++) {
   MPI_Finalize();
 }
 
-void stencil(const int nx, const int ny, const int width, const int height,
-             float* image, float* tmp_image)
+void stencil(const int ny, const int width, const int height,
+             float* image, float* tmp_image, int startcol, int endcol)
 {
   float calc = 3.0/5.0;
   float calc2 = 0.5/5.0;
   for (int i = 1; i < ny + 1; ++i) {
-    for (int j = 1; j < nx + 1; ++j) {
+    for (int j = startcol; j < endcol + 1; ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
-      // tmp_image[j + i * height] += (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2);
-      // tmp_image[j + i * height] += image[j     + (i + 1) * height] * calc2;
-      // tmp_image[j + i * height] += image[j - 1 + i       * height] * calc2;
-      // tmp_image[j + i * height] += image[j + 1 + i       * height] * calc2;
     }
   }
 }
@@ -188,4 +181,27 @@ double wtime(void)
   struct timeval tv;
   gettimeofday(&tv, NULL);
   return tv.tv_sec + tv.tv_usec * 1e-6;
+}
+
+
+void halo(rank, nprocs, image, startcol, endcol, working_cols){
+    if (rank == 0){
+      // send right, receive right
+      //store in array
+      //input into image
+    }
+    else if (rank == nprocs - 1){
+      //dend left receive left
+      //store in array
+      //input into image
+    }
+    else{
+      //send and receive both ways
+      //store in arrays
+      //input into image
+    }
+
+
+
+
 }
