@@ -69,34 +69,34 @@ int main(int argc, char* argv[])
   // stitch it back together
   float* final_image = malloc(sizeof(float) * width * height);
 
-  if (rank == 0){
-
-
-    MPI_Gather(
-    image,
-    1,
-    MPI_FLOAT,
-    final_image,
-    1,
-    MPI_FLOAT,
-    0,
-    MPI_COMM_WORLD);
-
-  }
-
-  else{
-
-    MPI_Gather(
-    image,
-    1,
-    MPI_FLOAT,
-    NULL,
-    1,
-    MPI_FLOAT,
-    0,
-    MPI_COMM_WORLD);
-
-  }
+  // if (rank == 0){
+  //
+  //
+  //   MPI_Gather(
+  //   image,
+  //   1,
+  //   MPI_FLOAT,
+  //   final_image,
+  //   1,
+  //   MPI_FLOAT,
+  //   0,
+  //   MPI_COMM_WORLD);
+  //
+  // }
+  //
+  // else{
+  //
+  //   MPI_Gather(
+  //   image,
+  //   1,
+  //   MPI_FLOAT,
+  //   NULL,
+  //   1,
+  //   MPI_FLOAT,
+  //   0,
+  //   MPI_COMM_WORLD);
+  //
+  // }
 
 
 
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
   printf(" runtime: %lf s\n", toc - tic);
   printf("------------------------------------\n");
 
-  output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
+  output_image(OUTPUT_FILE, nx, ny, width, height, image);
   free(image);
   free(final_image);
   free(tmp_image);
