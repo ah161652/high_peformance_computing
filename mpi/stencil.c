@@ -113,10 +113,14 @@ double toc = wtime();
   printf(" runtime: %lf s\n", toc - tic);
   printf("------------------------------------\n");}
 
-  if(rank ==0){
+  if(rank == 0){
   output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
-  free(image);
   free(final_image);
+}
+
+if(rank!=0){
+  free(image);
+
   free(tmp_image);}
 
   MPI_Finalize();
