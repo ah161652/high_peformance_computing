@@ -69,6 +69,8 @@ int main(int argc, char* argv[])
   // stitch it back together
   float* final_image = NULL;
 
+
+
   if (rank == 0){
   final_image = malloc(sizeof(float) * width * height);
 }
@@ -82,6 +84,9 @@ int main(int argc, char* argv[])
     MPI_FLOAT,
     0,
     MPI_COMM_WORLD);
+
+    printf("%d \n", image[0]);
+    printf("%d \n", final_image[0]);
 
 
   // Output
