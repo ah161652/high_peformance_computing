@@ -106,18 +106,20 @@ double toc = wtime();
   }
 
 
-
+  if(rank !=0){
   // Output
   printf("------------------------------------\n");
   printf(" runtime: %lf s\n", toc - tic);
-  printf("------------------------------------\n");
+  printf("------------------------------------\n");}
 
+  if(rank ==0){
   output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
   free(image);
   free(final_image);
-  free(tmp_image);
+  free(tmp_image);}
 
   MPI_Finalize();
+
 }
 
 void stencil(const int nx, const int ny, const int width, const int height,
