@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 
   output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
   free(image);
-  free(final_image)
+  free(final_image);
   free(tmp_image);
 
   MPI_Finalize();
