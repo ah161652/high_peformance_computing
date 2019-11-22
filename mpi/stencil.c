@@ -56,9 +56,10 @@ int main(int argc, char* argv[])
   if(rank!=0){
   float* image = malloc(sizeof(float) * width * height);
   float* tmp_image = malloc(sizeof(float) * width * height);
-  }
+
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
+}
 
   double tic = wtime();
   if(rank!=0){
