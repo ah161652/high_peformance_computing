@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
   int niters = atoi(argv[3]);
 
   // divide up work into columns
-   int nx_work = nx/(nprocs-1);
-   int start = (rank-1) * nx_work;
+   int nx_work = nx/(nprocs);
+   int start = (rank) * nx_work;
    int end = start + nx_work;
 
   // we pad the outer edge of the image to avoid out of range address issues in
@@ -51,28 +51,20 @@ int main(int argc, char* argv[])
   int width = nx + 2;
   int height = ny + 2;
 
-
-
-  if(rank!=0){
+  // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
   float* tmp_image = malloc(sizeof(float) * width * height);
 
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
-}
 
-  double tic = wtime();
-  if(rank!=0){
   // Call the stencil kernel
-
+  double tic = wtime();
   for (int t = 0; t < niters; ++t) {
     stencil(nx_work, ny, width, height, image, tmp_image);
     stencil(nx_work, ny, width, height, tmp_image, image);
   }
-
-}
-double toc = wtime();
-
+  double toc = wtime();
 
   // stitch it back together
   float* final_image = malloc(sizeof(float) * width * height);
@@ -107,24 +99,18 @@ double toc = wtime();
   }
 
 
-  if(rank !=0){
+
   // Output
   printf("------------------------------------\n");
   printf(" runtime: %lf s\n", toc - tic);
-  printf("------------------------------------\n");}
+  printf("------------------------------------\n");
 
-  if(rank == 0){
   output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
-  free(final_image);
-}
-
-if(rank!=0){
   free(image);
-
-  free(tmp_image);}
+  free(final_image)
+  free(tmp_image);
 
   MPI_Finalize();
-
 }
 
 void stencil(const int nx, const int ny, const int width, const int height,
