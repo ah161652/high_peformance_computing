@@ -85,8 +85,14 @@ int main(int argc, char* argv[])
     0,
     MPI_COMM_WORLD);
 
-    printf("%d \n", image[0]);
-    printf("%d \n", final_image[0]);
+    for (int i = 0; i < 10; i++) {
+      printf("%d \n", image[i]);
+    }
+    printf(" \n \n \n");
+    for (int i = 0; i < 10; i++) {
+      printf("%d \n", final_image[i]);
+    }
+  
 
 
   // Output
