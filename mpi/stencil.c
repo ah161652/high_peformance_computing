@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
   int height = ny + 2;
 
 
-  if(ranks!=0){
+
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
   float* tmp_image = malloc(sizeof(float) * width * height);
@@ -60,8 +60,10 @@ int main(int argc, char* argv[])
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
 
-  // Call the stencil kernel
   double tic = wtime();
+  if(ranks!=0){
+  // Call the stencil kernel
+
   for (int t = 0; t < niters; ++t) {
     stencil(nx_work, ny, width, height, image, tmp_image);
     stencil(nx_work, ny, width, height, tmp_image, image);
@@ -69,6 +71,7 @@ int main(int argc, char* argv[])
 
 }
 double toc = wtime();
+
 
   // stitch it back together
   float* final_image = malloc(sizeof(float) * width * height);
