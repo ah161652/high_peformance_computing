@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   init_image(nx, ny, width, height, image, tmp_image);
 
   double tic = wtime();
-  if(ranks!=0){
+  if(rank!=0){
   // Call the stencil kernel
 
   for (int t = 0; t < niters; ++t) {
