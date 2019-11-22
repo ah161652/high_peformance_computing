@@ -41,9 +41,10 @@ int main(int argc, char* argv[])
   int ny = atoi(argv[2]);
   int niters = atoi(argv[3]);
 
-  // int nx_work = nx/nprocs;
-  // int start = rank * nx_work;
-  // int end = start + nx_work;
+  // divide up work into columns
+   int nx_work = nx/(nprocs-1);
+   int start = (rank-1) * nx_work;
+   int end = start + nx_work;
 
   // we pad the outer edge of the image to avoid out of range address issues in
   // stencil
@@ -60,10 +61,44 @@ int main(int argc, char* argv[])
   // Call the stencil kernel
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil(nx, ny, width, height, image, tmp_image);
-    stencil(nx, ny, width, height, tmp_image, image);
+    stencil(nx_work, ny, width, height, image, tmp_image);
+    stencil(nx_work, ny, width, height, tmp_image, image);
   }
   double toc = wtime();
+
+  // stitch it back together
+  float* final_image = malloc(sizeof(float) * width * height);
+
+  if (rank == 0){
+
+
+    MPI_Gather(
+    image,
+    1,
+    MPI_FLOAT,
+    final_images,
+    1,
+    MPI_FLOAT,
+    0,
+    MPI_COMM_WORLD)
+
+  }
+
+  else{
+
+    MPI_Gather(
+    image,
+    1,
+    MPI_FLOAT,
+    NULL,
+    1,
+    MPI_FLOAT,
+    0,
+    MPI_COMM_WORLD)
+
+  }
+
+
 
   // Output
   printf("------------------------------------\n");
