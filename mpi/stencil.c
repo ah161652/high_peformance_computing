@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
   for (int t = 0; t < niters; ++t) {
     //halo(rank, nprocs, image, startcol, endcol, working_cols);
     stencil(nx, ny, width, height, image, tmp_image);
-    halo(rank, nprocs, tmp_image, startcol, endcol, working_cols);
+    // halo(rank, nprocs, tmp_image, startcol, endcol, working_cols);
     stencil(nx, ny, width, height, image, tmp_image);
   }
   double toc = wtime();
