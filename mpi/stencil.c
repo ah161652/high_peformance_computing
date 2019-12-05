@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <mpi.h>
 
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
@@ -15,6 +16,21 @@ double wtime(void);
 
 int main(int argc, char* argv[])
 {
+
+  //MPI setup
+  MPI_Init(&argc, &argv);
+  int nprocs, rank, flag;
+  //Check if init worked
+  MPI_Initialized(&flag);
+  if ( flag != 1 ) {
+    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  }
+  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+
+
+
   // Check usage
   if (argc != 4) {
     fprintf(stderr, "Usage: %s nx ny niters\n", argv[0]);
@@ -30,6 +46,22 @@ int main(int argc, char* argv[])
   // stencil
   int width = nx + 2;
   int height = ny + 2;
+
+  // divide up work into columns
+  int working_cols = nx/(nprocs);
+
+  //find starting col and ending col dependant on rank
+  //  int endcol;
+  //  int startcol;
+  //
+  // startcol = (rank * working_cols) + 1;
+  //
+  // if (rank == nprocs - 1) {
+  //       endcol = ny;
+  //   }
+  // else {
+  //      endcol = startcol + working_cols;
+  //   }
 
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
