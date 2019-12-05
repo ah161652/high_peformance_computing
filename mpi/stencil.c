@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   startcol = (rank * working_cols) + 1;
 
   if (rank == nprocs - 1) {
-        endcol = ny + 1;
+        endcol = nx + 1;
     }
   else {
        endcol = startcol + working_cols + 1;
