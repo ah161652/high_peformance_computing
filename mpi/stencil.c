@@ -56,37 +56,51 @@ int main(int argc, char* argv[])
   int num_cols;
   int num_cols_with_halo;
 
-  if (nx % nprocs == 0 ){
-    num_cols = width/(nprocs);
-  }
-  else{
-    if (rank != nprocs -1){
-      num_cols = width/(nprocs);
-    }
-    else{
-      num_cols = (width % nprocs) + (width/nprocs);
-    }
-  }
+  // if (nx % nprocs == 0 ){
+  //   num_cols = width/(nprocs);
+  // }
+  // else{
+  //   if (rank != nprocs -1){
+  //     num_cols = width/(nprocs);
+  //   }
+  //   else{
+  //     num_cols = (width % nprocs) + (width/nprocs);
+  //   }
+  // }
+  //
+  // if (rank == 0){
+  //   int num_cols_with_halo = num_cols + 1;
+  // }
+  // else if (rank = nprocs - 1){
+  //   num_cols_with_halo - num_cols + 1;
+  // }
+  // else{
+  //   num_cols_with_halo = num_cols +2;
+  // }
+  //
+  // int working_size = num_cols * height;
+  // int working_size_with_halo = num_cols_with_halo * height;
 
-  if (rank == 0){
-    int num_cols_with_halo = num_cols + 1;
-  }
-  else if (rank = nprocs - 1){
-    num_cols_with_halo - num_cols + 1;
-  }
-  else{
-    num_cols_with_halo = num_cols +2;
-  }
+  int working_size = height * width/nprocs;
+  int remainder_size = (width%nprocs)*height;
 
-  int working_size = num_cols * height;
-  int working_size_with_halo = num_cols_with_halo * height;
 
-  float* buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
-  float* tmp_buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
-  printf("DEBUG1\n");
+  float* buffer;
+  float* tmp_buffer;
+  if (rank == nprocs -1 ){
+    buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
+    tmp_buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
+  }
+  else {
+  buffer = (float*)malloc(sizeof(float) * working_size);
+  tmp_buffer = (float*)malloc(sizeof(float) * working_size);
+}
+
 
   MPI_Scatter(image, working_size_with_halo, MPI_FLOAT, buffer, working_size_with_halo, MPI_FLOAT, 0, MPI_COMM_WORLD);
-  printf("DEBUG2\n");
+
+  int num_cols = (rank == size-1) ? nx/size + nx%size : nx/size;
+
 
 
 
@@ -100,14 +114,14 @@ int main(int argc, char* argv[])
   }
   double toc = wtime();
 
-  printf("DEBUG3\n");
+
 
 
 float* final_image = malloc(sizeof(float)*width*height);
 
 MPI_Gather(tmp_buffer, working_size_with_halo, MPI_FLOAT,final_image ,working_size_with_halo, MPI_FLOAT,0, MPI_COMM_WORLD);
 
-printf("DEBUG4\n");
+
 
 
 
