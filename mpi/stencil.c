@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     num_cols_with_halo - num_cols + 1;
   }
   else{
-    num_cols_with_halo = num_cols +2
+    num_cols_with_halo = num_cols +2;
   }
 
   int working_size = num_cols * ny;
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
 float* final_image = malloc(sizeof(float)*ny*nx);
 
-MPI_Gather(bufferTmp, working_size_with_halo, MPI_FLOAT,final_image ,working_size_with_halo, MPI_FLOAT,0, MPI_COMM_WORLD);
+MPI_Gather(tmp_buffer, working_size_with_halo, MPI_FLOAT,final_image ,working_size_with_halo, MPI_FLOAT,0, MPI_COMM_WORLD);
 
 
 
