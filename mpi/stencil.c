@@ -28,9 +28,6 @@ int main(int argc, char* argv[])
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-
-
-
   // Check usage
   if (argc != 4) {
     fprintf(stderr, "Usage: %s nx ny niters\n", argv[0]);
@@ -110,7 +107,7 @@ void stencil(const int nx, const int ny, const int width, const int height,
   float calc2 = 0.5/5.0;
 
   for (int i = 1; i < ny + 1; ++i) {
-    for (int j = startcol; j < endcol; ++j) {
+    for (int j = 1; j < nx + 1; ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
       // tmp_image[j + i * height] += (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2);
