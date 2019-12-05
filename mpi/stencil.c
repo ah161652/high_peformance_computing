@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   // stitch it back together
   float* final_image = malloc(sizeof(float) * width * height);
 
-  final image  = image;
+  final_image  = image;
 
 
   // Output
