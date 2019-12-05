@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 }
 
 
-  MPI_Scatter(image, working_size_with_halo, MPI_FLOAT, buffer, working_size_with_halo, MPI_FLOAT, 0, MPI_COMM_WORLD);
+  MPI_Scatter(image, working_size, MPI_FLOAT, buffer, working_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
   int num_cols = (rank == nprocs-1) ? nx/nprocs + nx%nprocs : nx/nprocs;
 
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
 
 float* final_image = malloc(sizeof(float)*width*height);
 
-MPI_Gather(tmp_buffer, working_size_with_halo, MPI_FLOAT,final_image ,working_size_with_halo, MPI_FLOAT,0, MPI_COMM_WORLD);
+MPI_Gather(tmp_buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,0, MPI_COMM_WORLD);
 
 
 
