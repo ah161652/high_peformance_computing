@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <mpi.h>
 
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
 
 void stencil(const int nx, const int ny, const int width, const int height,
-             float* image, float* tmp_image, int startcol, int endcol);
+             float* image, float* tmp_image);
 void init_image(const int nx, const int ny, const int width, const int height,
                 float* image, float* tmp_image);
 void output_image(const char* file_name, const int nx, const int ny,
@@ -16,18 +15,6 @@ double wtime(void);
 
 int main(int argc, char* argv[])
 {
-
-  //MPI setup
-  MPI_Init(&argc, &argv);
-  int nprocs, rank, flag;
-  //Check if init worked
-  MPI_Initialized(&flag);
-  if ( flag != 1 ) {
-    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
-  }
-  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
   // Check usage
   if (argc != 4) {
     fprintf(stderr, "Usage: %s nx ny niters\n", argv[0]);
@@ -44,25 +31,6 @@ int main(int argc, char* argv[])
   int width = nx + 2;
   int height = ny + 2;
 
-  // divide up work into columns
-  int working_cols = nx/(nprocs);
-
-  //find starting col and ending col dependant on rank
-  int endcol;
-  int startcol;
-
-  startcol = (rank * working_cols) + 1;
-
-  if (rank == nprocs - 1) {
-        endcol = nx + 1;
-    }
-  else {
-       endcol = startcol + working_cols ;
-    }
-
-    // printf("%s",startcol);
-    // printf("%s",endcol);
-
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
   float* tmp_image = malloc(sizeof(float) * width * height);
@@ -70,12 +38,44 @@ int main(int argc, char* argv[])
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
 
+  //MPI setup
+  MPI_Init(&argc, &argv);
+  int nprocs, rank, flag;
+
+  //Check if init worked
+  MPI_Initialized(&flag);
+  if ( flag != 1 ) {
+    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  }
+
+  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  int proc_left = rank -1;
+  int proc_right = rank + 1;
+  int num_cols;
+
+  if (nx % nprocs == 0 ){
+    num_cols = nx/(nprocs);
+  }
+  else{
+    if (rank != nprocs -1){
+      num_cols = nx/(nprocs);
+    }
+    else{
+      num_cols = (nx % nprocs) + (nx/nprocs);
+    }
+  }
+
+  //int section = num_cols * ny;
+
+
+
   // Call the stencil kernel
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil(nx, ny, width, height, tmp_image, image, startcol, endcol);
-    //halo
-    stencil(nx, ny, width, height, tmp_image, image, startcol, endcol);
+    stencil(nx, ny, width, height, image, tmp_image);
+    stencil(nx, ny, width, height, tmp_image, image);
   }
   double toc = wtime();
 
@@ -84,28 +84,16 @@ int main(int argc, char* argv[])
   printf(" runtime: %lf s\n", toc - tic);
   printf("------------------------------------\n");
 
-  if (rank == 0){
-  //gather and stitch
-}
-
-else {
-  //send segment
-}
-
-//outputting
   output_image(OUTPUT_FILE, nx, ny, width, height, image);
   free(image);
   free(tmp_image);
 }
 
-
-
 void stencil(const int nx, const int ny, const int width, const int height,
-             float* image, float* tmp_image, int startcol, int endcol)
+             float* image, float* tmp_image)
 {
   float calc = 3.0/5.0;
   float calc2 = 0.5/5.0;
-
   for (int i = 1; i < ny + 1; ++i) {
     for (int j = 1; j < nx + 1; ++j) {
 

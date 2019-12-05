@@ -52,17 +52,17 @@ int main(int argc, char* argv[])
   int working_cols = nx/(nprocs);
 
   //find starting col and ending col dependant on rank
-  // int endcol;
-  // int startcol;
-  //
-  // startcol = (rank * working_cols) + 2;
-  //
-  // if (rank == nprocs - 1) {
-  //       endcol = ny + 2;
-  //   }
-  // else {
-  //      endcol = startcol + working_cols;
-  //   }
+  int endcol;
+  int startcol;
+
+  startcol = (rank * working_cols) + 1;
+
+  if (rank == nprocs - 1) {
+        endcol = nx + 1;
+    }
+  else {
+       endcol = startcol + working_cols ;
+    }
 
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
