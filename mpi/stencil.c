@@ -63,8 +63,8 @@ int main(int argc, char* argv[])
        endcol = startcol + working_cols + 1;
     }
 
-    printf(%s,startcol);
-    printf(%s,endcol);
+    printf("%s",startcol);
+    printf("%s",endcol);
 
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
