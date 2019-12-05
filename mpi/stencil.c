@@ -51,13 +51,15 @@ int main(int argc, char* argv[])
   int working_cols = nx/(nprocs);
 
   //find starting col and ending col dependant on rank
-  int startcol = rank * working_cols;
+  int endcol;
+  int startcol;
+   startcol = rank * working_cols;
   if (rank == nprocs - 1) {
         endcol = ny - 1;
     }
 
   else {
-      int endcol = startcol + working_cols - 1;
+       endcol = startcol + working_cols - 1;
     }
 
   // Allocate the image
