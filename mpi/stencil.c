@@ -95,8 +95,11 @@ int main(int argc, char* argv[])
   tmp_buffer = (float*)malloc(sizeof(float) * working_size);
 }
 
+printf("Good before scatter\n");
+
 
   MPI_Scatter(image, working_size, MPI_FLOAT, buffer, working_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
+  printf("Good after scatter\n");
 
   int num_cols = (rank == nprocs-1) ? width/nprocs + width%nprocs : width/nprocs;
 
@@ -113,12 +116,14 @@ int main(int argc, char* argv[])
   }
   double toc = wtime();
 
-
+printf("Good after stencil\n");
 
 
 float* final_image = malloc(sizeof(float)*width*height);
 
 MPI_Gather(buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,0, MPI_COMM_WORLD);
+
+printf("Good After gather\n");
 
 
 
