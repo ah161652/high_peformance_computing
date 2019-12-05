@@ -83,9 +83,10 @@ int main(int argc, char* argv[])
 
   float* buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
   float* tmp_buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
-  printf("DEBUG\n", );
+  printf("DEBUG1\n");
 
   MPI_Scatter(image, working_size_with_halo, MPI_FLOAT, buffer, working_size_with_halo, MPI_FLOAT, 0, MPI_COMM_WORLD);
+  printf("DEBUG2\n");
 
 
 
@@ -99,10 +100,14 @@ int main(int argc, char* argv[])
   }
   double toc = wtime();
 
+  printf("DEBUG3\n");
+
 
 float* final_image = malloc(sizeof(float)*width*height);
 
 MPI_Gather(tmp_buffer, working_size_with_halo, MPI_FLOAT,final_image ,working_size_with_halo, MPI_FLOAT,0, MPI_COMM_WORLD);
+
+printf("DEBUG4\n");
 
 
 
