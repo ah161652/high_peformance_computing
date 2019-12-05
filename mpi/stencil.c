@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
     }
 
   else {
-      int  endcol = startcol + working_cols - 1;
+      int endcol = startcol + working_cols - 1;
     }
 
   // Allocate the image
@@ -184,7 +184,7 @@ double wtime(void)
 }
 
 
-void halo(rank, nprocs, image, startcol, endcol, working_cols){
+void halo(int rank, int nprocs, float* image, int startcol, int endcol, int working_cols){
     if (rank == 0){
       // send right, receive right
       //store in array
