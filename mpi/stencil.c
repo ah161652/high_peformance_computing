@@ -6,8 +6,9 @@
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
 
-void stencil(const int ny, const int width, const int height,
-             float* image, float* tmp_image, int startcol, int endcol);
+
+void stencil(const int nx, const int ny, const int width, const int height,
+             float* image, float* tmp_image);
 void init_image(const int nx, const int ny, const int width, const int height,
                 float* image, float* tmp_image);
 void output_image(const char* file_name, const int nx, const int ny,
@@ -51,17 +52,17 @@ int main(int argc, char* argv[])
   int working_cols = nx/(nprocs);
 
   //find starting col and ending col dependant on rank
-  int endcol;
-  int startcol;
-
-  startcol = (rank * working_cols) + 2;
-
-  if (rank == nprocs - 1) {
-        endcol = ny + 2;
-    }
-  else {
-       endcol = startcol + working_cols;
-    }
+  // int endcol;
+  // int startcol;
+  //
+  // startcol = (rank * working_cols) + 2;
+  //
+  // if (rank == nprocs - 1) {
+  //       endcol = ny + 2;
+  //   }
+  // else {
+  //      endcol = startcol + working_cols;
+  //   }
 
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
@@ -74,9 +75,9 @@ int main(int argc, char* argv[])
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
     //halo(rank, nprocs, image, startcol, endcol, working_cols);
-    stencil(ny, width, height, image, tmp_image, startcol, endcol);
+    stencil(nx, ny, width, height, image, tmp_image);
     halo(rank, nprocs, tmp_image, startcol, endcol, working_cols);
-    stencil(ny, width, height, tmp_image, image, startcol, endcol);
+    stencil(nx, ny, width, height, image, tmp_image);
   }
   double toc = wtime();
 
@@ -99,15 +100,20 @@ int main(int argc, char* argv[])
   MPI_Finalize();
 }
 
-void stencil(const int ny, const int width, const int height,
-             float* image, float* tmp_image, int startcol, int endcol)
+
+void stencil(const int nx, const int ny, const int width, const int height,
+             float* image, float* tmp_image)
 {
   float calc = 3.0/5.0;
   float calc2 = 0.5/5.0;
   for (int i = 1; i < ny + 1; ++i) {
-    for (int j = startcol; j < endcol + 1; ++j) {
+    for (int j = 1; j < nx + 1; ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
+      // tmp_image[j + i * height] += (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2);
+      // tmp_image[j + i * height] += image[j     + (i + 1) * height] * calc2;
+      // tmp_image[j + i * height] += image[j - 1 + i       * height] * calc2;
+      // tmp_image[j + i * height] += image[j + 1 + i       * height] * calc2;
     }
   }
 }
