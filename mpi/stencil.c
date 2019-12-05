@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 
   MPI_Scatter(image, working_size, MPI_FLOAT, buffer, working_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
-  int num_cols = (rank == nprocs-1) ? nx/nprocs + nx%nprocs : nx/nprocs;
+  int num_cols = (rank == nprocs-1) ? width/nprocs + width%nprocs : width/nprocs;
 
 
 
