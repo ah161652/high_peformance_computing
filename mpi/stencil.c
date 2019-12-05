@@ -7,7 +7,7 @@
 #define OUTPUT_FILE "stencil.pgm"
 
 void stencil(const int nx, const int ny, const int width, const int height,
-             float* image, float* tmp_image);
+             float* image, float* tmp_image, int startcol, int endcol);
 void init_image(const int nx, const int ny, const int width, const int height,
                 float* image, float* tmp_image);
 void output_image(const char* file_name, const int nx, const int ny,
@@ -51,17 +51,17 @@ int main(int argc, char* argv[])
   int working_cols = nx/(nprocs);
 
   //find starting col and ending col dependant on rank
-  //  int endcol;
-  //  int startcol;
-  //
-  // startcol = (rank * working_cols) + 1;
-  //
-  // if (rank == nprocs - 1) {
-  //       endcol = ny;
-  //   }
-  // else {
-  //      endcol = startcol + working_cols;
-  //   }
+  int endcol;
+  int startcol;
+
+  startcol = (rank * working_cols) + 1;
+
+  if (rank == nprocs - 1) {
+        endcol = ny + 1;
+    }
+  else {
+       endcol = startcol + working_cols + 1;
+    }
 
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
@@ -73,8 +73,9 @@ int main(int argc, char* argv[])
   // Call the stencil kernel
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil(nx, ny, width, height, image, tmp_image);
-    stencil(nx, ny, width, height, tmp_image, image);
+    stencil(nx, ny, width, height, tmp_image, image, startcol, endcol);
+    //halo
+    stencil(nx, ny, width, height, tmp_image, image, startcol, endcol);
   }
   double toc = wtime();
 
@@ -83,18 +84,24 @@ int main(int argc, char* argv[])
   printf(" runtime: %lf s\n", toc - tic);
   printf("------------------------------------\n");
 
+  if (rank == 0){
+  //gather and stitch
+
+  //outputting
   output_image(OUTPUT_FILE, nx, ny, width, height, image);
   free(image);
   free(tmp_image);
 }
+}
 
 void stencil(const int nx, const int ny, const int width, const int height,
-             float* image, float* tmp_image)
+             float* image, float* tmp_image, int startcol, int endcol)
 {
   float calc = 3.0/5.0;
   float calc2 = 0.5/5.0;
+
   for (int i = 1; i < ny + 1; ++i) {
-    for (int j = 1; j < nx + 1; ++j) {
+    for (int j = startcol; j < endcol; ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
       // tmp_image[j + i * height] += (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2);
