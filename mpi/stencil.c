@@ -35,9 +35,6 @@ int main(int argc, char* argv[])
   float* image = malloc(sizeof(float) * width * height);
   float* tmp_image = malloc(sizeof(float) * width * height);
 
-  // Set the input image
-  init_image(nx, ny, width, height, image, tmp_image);
-
   //MPI setup
   MPI_Init(&argc, &argv);
   int nprocs, rank, flag;
@@ -50,6 +47,11 @@ int main(int argc, char* argv[])
 
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  // Set the input image
+  init_image(nx, ny, width, height, image, tmp_image);
+
+
 
   int proc_left = rank -1;
   int proc_right = rank + 1;
