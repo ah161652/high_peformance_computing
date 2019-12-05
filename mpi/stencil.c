@@ -53,8 +53,7 @@ int main(int argc, char* argv[])
   init_image(nx, ny, width, height, image, tmp_image);
 }
 
-  int num_cols;
-  int num_cols_with_halo;
+
 
   // if (nx % nprocs == 0 ){
   //   num_cols = width/(nprocs);
