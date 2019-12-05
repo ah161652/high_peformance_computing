@@ -92,12 +92,12 @@ else {
   //send segment
 }
 
-if (rank == 0){  //outputting
+//outputting
   output_image(OUTPUT_FILE, nx, ny, width, height, image);
   free(image);
   free(tmp_image);
 }
-}
+
 
 
 void stencil(const int nx, const int ny, const int width, const int height,
