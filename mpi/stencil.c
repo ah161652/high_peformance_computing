@@ -53,11 +53,12 @@ int main(int argc, char* argv[])
   //find starting col and ending col dependant on rank
   int endcol;
   int startcol;
-  startcol = (rank * working_cols) + 2;
-  if (rank == nprocs - 1) {
-        endcol = ny - 3;
-    }
 
+  startcol = (rank * working_cols) + 2;
+
+  if (rank == nprocs - 1) {
+        endcol = ny - 2;
+    }
   else {
        endcol = startcol + working_cols - 3;
     }
