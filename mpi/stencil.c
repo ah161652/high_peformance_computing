@@ -83,6 +83,7 @@ int main(int argc, char* argv[])
 
   float* buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
   float* tmp_buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
+  printf("DEBUG\n", );
 
   MPI_Scatter(image, working_size_with_halo, MPI_FLOAT, buffer, working_size_with_halo, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
