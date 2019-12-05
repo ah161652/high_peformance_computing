@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
     stencil(num_cols, ny, width, height, buffer, tmp_buffer);
-    stencil(num_cols, ny, width, height, buffer, tmp_buffer);
+    stencil(num_cols, ny, width, height, tmp_buffer, buffer);
   }
   double toc = wtime();
 
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
 float* final_image = malloc(sizeof(float)*width*height);
 
-MPI_Gather(tmp_buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,0, MPI_COMM_WORLD);
+MPI_Gather(buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,0, MPI_COMM_WORLD);
 
 
 
