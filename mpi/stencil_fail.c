@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <mpi.h>
 
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
+
 
 void stencil(const int nx, const int ny, const int width, const int height,
              float* image, float* tmp_image);
@@ -12,9 +14,24 @@ void init_image(const int nx, const int ny, const int width, const int height,
 void output_image(const char* file_name, const int nx, const int ny,
                   const int width, const int height, float* image);
 double wtime(void);
+void halo(int rank, int nprocs, float* image, int startcol, int endcol, int working_cols);
 
 int main(int argc, char* argv[])
 {
+  //MPI setup
+  MPI_Init(&argc, &argv);
+  int nprocs, rank, flag;
+
+  //Check if init worked
+  MPI_Initialized(&flag);
+  if ( flag != 1 ) {
+    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  }
+
+  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+
   // Check usage
   if (argc != 4) {
     fprintf(stderr, "Usage: %s nx ny niters\n", argv[0]);
@@ -31,6 +48,22 @@ int main(int argc, char* argv[])
   int width = nx + 2;
   int height = ny + 2;
 
+  // divide up work into columns
+  int working_cols = nx/(nprocs);
+
+  //find starting col and ending col dependant on rank
+  // int endcol;
+  // int startcol;
+  //
+  // startcol = (rank * working_cols) + 2;
+  //
+  // if (rank == nprocs - 1) {
+  //       endcol = ny + 2;
+  //   }
+  // else {
+  //      endcol = startcol + working_cols;
+  //   }
+
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
   float* tmp_image = malloc(sizeof(float) * width * height);
@@ -41,10 +74,20 @@ int main(int argc, char* argv[])
   // Call the stencil kernel
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
+    //halo(rank, nprocs, image, startcol, endcol, working_cols);
     stencil(nx, ny, width, height, image, tmp_image);
-    stencil(nx, ny, width, height, tmp_image, image);
+    // halo(rank, nprocs, tmp_image, startcol, endcol, working_cols);
+    stencil(nx, ny, width, height, image, tmp_image);
   }
   double toc = wtime();
+
+
+
+  // stitch it back together
+  float* final_image = malloc(sizeof(float) * width * height);
+
+  final_image  = image;
+
 
   // Output
   printf("------------------------------------\n");
@@ -53,8 +96,12 @@ int main(int argc, char* argv[])
 
   output_image(OUTPUT_FILE, nx, ny, width, height, image);
   free(image);
+  free(final_image);
   free(tmp_image);
+
+  MPI_Finalize();
 }
+
 
 void stencil(const int nx, const int ny, const int width, const int height,
              float* image, float* tmp_image)
@@ -145,4 +192,32 @@ double wtime(void)
   struct timeval tv;
   gettimeofday(&tv, NULL);
   return tv.tv_sec + tv.tv_usec * 1e-6;
+}
+
+
+void halo(int rank, int nprocs, float* image, int startcol, int endcol, int working_cols){
+    if (rank == 0){
+      // send right, receive right
+      //store in array
+      //input into image
+
+
+
+    }
+    else if (rank == nprocs - 1){
+      //send left receive left
+      //store in array
+      //input into image
+    }
+    else{
+      //send and receive both ways
+      //store in arrays
+      //input into image
+    }
+
+    return;
+
+
+
+
 }
