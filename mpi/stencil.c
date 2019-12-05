@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
 float* final_image = malloc(sizeof(float)*width*height);
 
-MPI_Gather(tmp_buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,0, MPI_COMM_WORLD);
+MPI_Gather(buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,0, MPI_COMM_WORLD);
 
 
 
@@ -154,6 +154,7 @@ void stencil(const int nx, const int ny, const int width, const int height,
       // tmp_image[j + i * height] += image[j     + (i + 1) * height] * calc2;
       // tmp_image[j + i * height] += image[j - 1 + i       * height] * calc2;
       // tmp_image[j + i * height] += image[j + 1 + i       * height] * calc2;
+      printf("debug\n");
     }
   }
 }
