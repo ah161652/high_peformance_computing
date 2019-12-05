@@ -69,6 +69,8 @@ int main(int argc, char* argv[])
 
   //int section = num_cols * ny;
 
+  //sendimages
+
 
 
   // Call the stencil kernel
@@ -79,14 +81,24 @@ int main(int argc, char* argv[])
   }
   double toc = wtime();
 
-  // Output
-  printf("------------------------------------\n");
-  printf(" runtime: %lf s\n", toc - tic);
-  printf("------------------------------------\n");
+  // gather
+  //stich
 
+
+  if(rank == 0){
   output_image(OUTPUT_FILE, nx, ny, width, height, image);
+}
+MPI_Finalize();
+
+// Output
+printf("------------------------------------\n");
+printf(" runtime: %lf s\n", toc - tic);
+printf("------------------------------------\n");
+
+
   free(image);
   free(tmp_image);
+
 }
 
 void stencil(const int nx, const int ny, const int width, const int height,
