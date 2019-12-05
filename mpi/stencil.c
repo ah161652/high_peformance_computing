@@ -13,7 +13,7 @@ void init_image(const int nx, const int ny, const int width, const int height,
 void output_image(const char* file_name, const int nx, const int ny,
                   const int width, const int height, float* image);
 double wtime(void);
-void halo(int rank, int nprocs, float* image, int startcol, int endcol, int working_cols)
+void halo(int rank, int nprocs, float* image, int startcol, int endcol, int working_cols);
 
 int main(int argc, char* argv[])
 {
