@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 
   float* buffer;
   float* tmp_buffer;
-  if (rank == nprocs -1 ){
+  if ((rank == nprocs -1) && (nprocs != 1) ){
     buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
     tmp_buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
   }
