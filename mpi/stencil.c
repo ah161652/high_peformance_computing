@@ -126,7 +126,7 @@ MPI_Gather(buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,
 
   if(rank == 0){
 
-  output_image(OUTPUT_FILE, nx, ny, width, height, image);
+  output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
 }
 MPI_Finalize();
 
@@ -154,7 +154,6 @@ void stencil(const int nx, const int ny, const int width, const int height,
       // tmp_image[j + i * height] += image[j     + (i + 1) * height] * calc2;
       // tmp_image[j + i * height] += image[j - 1 + i       * height] * calc2;
       // tmp_image[j + i * height] += image[j + 1 + i       * height] * calc2;
-      printf("debug\n");
     }
   }
 }
