@@ -57,14 +57,14 @@ int main(int argc, char* argv[])
   int num_cols_with_halo;
 
   if (nx % nprocs == 0 ){
-    num_cols = nx/(nprocs);
+    num_cols = width/(nprocs);
   }
   else{
     if (rank != nprocs -1){
-      num_cols = nx/(nprocs);
+      num_cols = width/(nprocs);
     }
     else{
-      num_cols = (nx % nprocs) + (nx/nprocs);
+      num_cols = (width % nprocs) + (width/nprocs);
     }
   }
 
@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
     num_cols_with_halo = num_cols +2;
   }
 
-  int working_size = num_cols * ny;
-  int working_size_with_halo = num_cols_with_halo * ny;
+  int working_size = num_cols * height;
+  int working_size_with_halo = num_cols_with_halo * height;
 
   float* buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
   float* tmp_buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
   double toc = wtime();
 
 
-float* final_image = malloc(sizeof(float)*ny*nx);
+float* final_image = malloc(sizeof(float)*width*height);
 
 MPI_Gather(tmp_buffer, working_size_with_halo, MPI_FLOAT,final_image ,working_size_with_halo, MPI_FLOAT,0, MPI_COMM_WORLD);
 
