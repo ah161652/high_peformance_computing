@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
     }
 
   else {
-        endcol = startcol + working_cols - 1;
+      int  endcol = startcol + working_cols - 1;
     }
 
   // Allocate the image
