@@ -57,10 +57,10 @@ int main(int argc, char* argv[])
   startcol = (rank * working_cols) + 2;
 
   if (rank == nprocs - 1) {
-        endcol = ny - 2;
+        endcol = ny + 2;
     }
   else {
-       endcol = startcol + working_cols - 3;
+       endcol = startcol + working_cols;
     }
 
   // Allocate the image
