@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
         endcol = nx + 1;
     }
   else {
-       endcol = startcol + working_cols + 1;
+       endcol = startcol + working_cols ;
     }
 
     // printf("%s",startcol);
