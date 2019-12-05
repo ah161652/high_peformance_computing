@@ -63,6 +63,9 @@ int main(int argc, char* argv[])
        endcol = startcol + working_cols + 1;
     }
 
+    printf(startcol);
+    printf(endcol);
+
   // Allocate the image
   float* image = malloc(sizeof(float) * width * height);
   float* tmp_image = malloc(sizeof(float) * width * height);
@@ -86,13 +89,19 @@ int main(int argc, char* argv[])
 
   if (rank == 0){
   //gather and stitch
+}
 
-  //outputting
+else {
+  //send segment
+}
+
+if (rank == 0){  //outputting
   output_image(OUTPUT_FILE, nx, ny, width, height, image);
   free(image);
   free(tmp_image);
 }
 }
+
 
 void stencil(const int nx, const int ny, const int width, const int height,
              float* image, float* tmp_image, int startcol, int endcol)
