@@ -48,14 +48,13 @@ int main(int argc, char* argv[])
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+  if(rank ==0){
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
+}
 
-
-
-  int proc_left = rank -1;
-  int proc_right = rank + 1;
   int num_cols;
+  int num_cols_with_halo;
 
   if (nx % nprocs == 0 ){
     num_cols = nx/(nprocs);
@@ -69,25 +68,45 @@ int main(int argc, char* argv[])
     }
   }
 
-  //int section = num_cols * ny;
+  if (rank == 0){
+    int num_cols_with_halo = num_cols + 1;
+  }
+  else if (rank = nprocs - 1){
+    num_cols_with_halo - num_cols + 1;
+  }
+  else{
+    num_cols_with_halo = num_cols +2
+  }
 
-  //sendimages
+  int working_size = num_cols * ny;
+  int working_size_with_halo = num_cols_with_halo * ny;
+
+  float* buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
+  float* tmp_buffer = (float*)malloc(sizeof(float) * working_size_with_halo);
+
+  MPI_Scatter(image, working_size_with_halo, MPI_FLOAT, buffer, working_size_with_halo, MPI_FLOAT, 0, MPI_COMM_WORLD);
+
+
 
 
 
   // Call the stencil kernel
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil(num_cols, ny, width, height, image, tmp_image);
-    stencil(num_cols, ny, width, height, tmp_image, image);
+    stencil(num_cols, ny, width, height, buffer, tmp_buffer);
+    stencil(num_cols, ny, width, height, buffer, tmp_buffer);
   }
   double toc = wtime();
 
-  // gather
-  //stich
+
+float* final_image = malloc(sizeof(float)*ny*nx);
+
+MPI_Gather(bufferTmp, working_size_with_halo, MPI_FLOAT,final_image ,working_size_with_halo, MPI_FLOAT,0, MPI_COMM_WORLD);
+
 
 
   if(rank == 0){
+
   output_image(OUTPUT_FILE, nx, ny, width, height, image);
 }
 MPI_Finalize();
