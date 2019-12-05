@@ -189,9 +189,12 @@ void halo(rank, nprocs, image, startcol, endcol, working_cols){
       // send right, receive right
       //store in array
       //input into image
+
+
+
     }
     else if (rank == nprocs - 1){
-      //dend left receive left
+      //send left receive left
       //store in array
       //input into image
     }
@@ -200,6 +203,8 @@ void halo(rank, nprocs, image, startcol, endcol, working_cols){
       //store in arrays
       //input into image
     }
+
+    return;
 
 
 
