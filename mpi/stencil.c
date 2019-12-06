@@ -35,6 +35,15 @@ int main(int argc, char* argv[])
   float* image = malloc(sizeof(float) * width * height);
   float* tmp_image = malloc(sizeof(float) * width * height);
 
+
+
+
+
+
+
+
+
+
   //MPI setup
   MPI_Init(&argc, &argv);
   int nprocs, rank, flag;
@@ -48,91 +57,107 @@ int main(int argc, char* argv[])
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  if(rank ==0){
+  // if(rank ==0){
   // Set the input image
   init_image(nx, ny, width, height, image, tmp_image);
-}
+// }
 
 
 
-  // if (nx % nprocs == 0 ){
-  //   num_cols = width/(nprocs);
-  // }
-  // else{
-  //   if (rank != nprocs -1){
-  //     num_cols = width/(nprocs);
-  //   }
-  //   else{
-  //     num_cols = (width % nprocs) + (width/nprocs);
-  //   }
-  // }
-  //
-  // if (rank == 0){
-  //   int num_cols_with_halo = num_cols + 1;
-  // }
-  // else if (rank = nprocs - 1){
-  //   num_cols_with_halo - num_cols + 1;
-  // }
-  // else{
-  //   num_cols_with_halo = num_cols +2;
-  // }
-  //
+
+
+
+
+
+  // if 1 processor then run sequentially
+  if (nprocs == 1){
+
+  double tic = wtime();
+ for (int t = 0; t < niters; ++t) {
+   stencil(nx, ny, width, height, image, tmp_image);
+   stencil(nx, ny, width, height, tmp_image, image);
+ }
+ double toc = wtime();
+
+ // Output
+ printf("------------------------------------\n");
+ printf(" runtime: %lf s\n", toc - tic);
+ printf("------------------------------------\n");
+
+ output_image(OUTPUT_FILE, nx, ny, width, height, image);
+ free(image);
+ free(tmp_image);
+
+ return;
+
+  }
+
+
+
+
+
+
+
+
   // int working_size = num_cols * height;
   // int working_size_with_halo = num_cols_with_halo * height;
 
-  int working_size = height * width/nprocs;
-  int remainder_size = (width%nprocs)*height;
+  // int working_size = height * width/nprocs;
+  // int remainder_size = (width%nprocs)*height;
 
 
-  float* buffer;
-  float* tmp_buffer;
-  if ((rank == nprocs -1) ){
-    buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
-    tmp_buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
-  }
-  else {
-  buffer = (float*)malloc(sizeof(float) * working_size);
-  tmp_buffer = (float*)malloc(sizeof(float) * working_size);
-}
+//   float* buffer;
+//   float* tmp_buffer;
+//   if ((rank == nprocs -1) ){
+//     buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
+//     tmp_buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
+//   }
+//   else {
+//   buffer = (float*)malloc(sizeof(float) * working_size);
+//   tmp_buffer = (float*)malloc(sizeof(float) * working_size);
+// }
 
-printf("Good before scatter\n");
-
-
-  MPI_Scatter(image, working_size, MPI_FLOAT, buffer, working_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
-  printf("Good after scatter\n");
-
-  int num_cols = ((rank == nprocs-1) ? width/nprocs + width%nprocs : width/nprocs) - 2;
-
+// printf("Good before scatter\n");
+//
+//
+//   MPI_Scatter(image, working_size, MPI_FLOAT, buffer, working_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
+//   printf("Good after scatter\n");
 
 
 
 
 
-  // Call the stencil kernel
+
+
+  // Call the stencil kernel under mpi
+  int nx_mpi = ((rank == nprocs-1) ? (width-2)/nprocs + (width-2)%nprocs : (width-2)/nprocs);
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil(num_cols, ny, width, height, buffer, tmp_buffer);
-    stencil(num_cols, ny, width, height, tmp_buffer, buffer);
+    stencil(nx_mpi, ny, width, height, image, tmp_image);
+    //halo
+    stencil(nx_mpi, ny, width, height, tmp_image, image);
+    //halo
   }
   double toc = wtime();
 
-printf("Good after stencil\n");
+
+
+
+
+
+
+
+
 
 
 float* final_image = malloc(sizeof(float)*width*height);
 
-MPI_Gather(buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,0, MPI_COMM_WORLD);
-
-printf("Good After gather\n");
+//MPI_Gather(buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,0, MPI_COMM_WORLD);
 
 
 
+output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
 
-
-  if(rank == 0){
-
-  output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
-}
 MPI_Finalize();
 
 // Output
@@ -151,6 +176,10 @@ void stencil(const int nx, const int ny, const int width, const int height,
 {
   float calc = 3.0/5.0;
   float calc2 = 0.5/5.0;
+
+
+if (rank == 0){
+
   for (int i = 1; i < ny + 1; ++i) {
     for (int j = 1; j < nx + 1; ++j) {
 
@@ -161,6 +190,11 @@ void stencil(const int nx, const int ny, const int width, const int height,
       // tmp_image[j + i * height] += image[j + 1 + i       * height] * calc2;
     }
   }
+
+
+}
+
+
 }
 
 
