@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
   for (int t = 0; t < niters; ++t) {
     stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, size);
     //halo
-    stencill_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , size);
+    stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , size);
     //halo
   }
   double toc = wtime();
@@ -147,7 +147,7 @@ if (rank == 0){
 
 else{
   for (int i = 0; i < section_size; i++) {
-    buff[i] = image[start_pxl + i]
+    buff[i] = image[start_pxl + i];
   }
   MPI_Send(buff,section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
 }
@@ -213,7 +213,7 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
   }
 }
 
-else if (rank == nproc -1){
+else if (rank == nprocs -1){
 
   for (int i = 1; i < ny + 1; ++i) {
     for (int j = start; j < (width); ++j) {
