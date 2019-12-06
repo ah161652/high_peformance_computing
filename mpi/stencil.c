@@ -14,7 +14,7 @@ void output_image(const char* file_name, const int nx, const int ny,
 double wtime(void);
 void stencil_mpi(const int nx, const int ny, const int width, const int height,
              float* image, float* tmp_image, int rank, int nprocs);
-void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size);
+void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size, int nprocs);
 
 int main(int argc, char* argv[])
 {
@@ -112,16 +112,16 @@ double tic = wtime();
  //define starting pixel
  int start_pxl = ((rank*nx_mpi)+1)*height;
 
- float* buffer = malloc(height*sizeof(float));
+ float* buff = malloc(height*sizeof(float));
 
 
    // Call the stencil kernel under mpi
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
     stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, nprocs);
-    halo(rank, tmp_image, height, buff, start_pxl, nx_mpi, section_size);
+    halo(rank, tmp_image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
     stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , nprocs);
-    halo(rank, image, height, buff, start_pxl, nx_mpi, section_size);
+    halo(rank, image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
   }
   double toc = wtime();
 
@@ -241,7 +241,7 @@ else{
 
 }
 
-void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size)
+void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size, int nprocs)
 {
 if(rank == 0){
   MPI_Sendrecv(&image[start_pxl + (nx_mpi-1)*height], height,  MPI_FLOAT, rank + 1, 0,
@@ -260,7 +260,7 @@ else if ( rank == nprocs - 1){
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
                for (int i = 0; i < height; ++i) {
-                 image[start - height + i] = buff[i];
+                 image[start_pxl - height + i] = buff[i];
 }
 }
 
@@ -270,7 +270,8 @@ else {
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
                for (int i = 0; i < height; ++i) {
-                 image[start - height + i] = buff[i];
+                 image[start_pxl - height + i] = buff[i];
+               }
 
  MPI_Sendrecv(&image[start_pxl], height,  MPI_FLOAT, rank - 1, 0,
               buff, height, MPI_FLOAT, rank+1, 0,
@@ -282,6 +283,7 @@ else {
 }
 
 
+}
 }
 
 
