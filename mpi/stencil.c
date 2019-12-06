@@ -12,6 +12,8 @@ void init_image(const int nx, const int ny, const int width, const int height,
 void output_image(const char* file_name, const int nx, const int ny,
                   const int width, const int height, float* image);
 double wtime(void);
+void stencil_mpi(const int nx, const int ny, const int width, const int height,
+             float* image, float* tmp_image, int rank, int nprocs);
 
 int main(int argc, char* argv[])
 {
@@ -57,10 +59,9 @@ int main(int argc, char* argv[])
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  // if(rank ==0){
-  // Set the input image
+
   init_image(nx, ny, width, height, image, tmp_image);
-// }
+
 
 
 
@@ -89,7 +90,6 @@ int main(int argc, char* argv[])
  free(tmp_image);
 
  return 0;
-
   }
 
 
@@ -97,45 +97,29 @@ int main(int argc, char* argv[])
 
 
 
+  // Split up columns
+  int nx_mpi;
+ if(rank == nprocs - 1){
+   nx_mpi = (nx/nprocs) + (nx%nprocs);
+ }
+ else{
+   nx_mpi = nx/nprocs;
+ }
+
+ int section_size = height*nx_mpi;
+
+ //define starting pixel
+ int start_pxl = ((rank*nx_mpi)+1)*height;
+
+ float* buffer = malloc(height*sizeof(float));
 
 
-  // int working_size = num_cols * height;
-  // int working_size_with_halo = num_cols_with_halo * height;
-
-  // int working_size = height * width/nprocs;
-  // int remainder_size = (width%nprocs)*height;
-
-
-//   float* buffer;
-//   float* tmp_buffer;
-//   if ((rank == nprocs -1) ){
-//     buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
-//     tmp_buffer = (float*)malloc(sizeof(float) * (working_size + remainder_size));
-//   }
-//   else {
-//   buffer = (float*)malloc(sizeof(float) * working_size);
-//   tmp_buffer = (float*)malloc(sizeof(float) * working_size);
-// }
-
-// printf("Good before scatter\n");
-//
-//
-//   MPI_Scatter(image, working_size, MPI_FLOAT, buffer, working_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
-//   printf("Good after scatter\n");
-
-
-
-
-
-
-
-  // Call the stencil kernel under mpi
-  int nx_mpi = ((rank == nprocs-1) ? (width-2)/nprocs + (width-2)%nprocs : (width-2)/nprocs);
+   // Call the stencil kernel under mpi
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil(nx_mpi, ny, width, height, image, tmp_image);
+    stenci_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, size);
     //halo
-    stencil(nx_mpi, ny, width, height, tmp_image, image);
+    stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , size);
     //halo
   }
   double toc = wtime();
@@ -149,16 +133,24 @@ int main(int argc, char* argv[])
 
 
 
-
+float* buff = malloc(sizeof(float)*section_size);
 float* final_image = malloc(sizeof(float)*width*height);
 
-//MPI_Gather(buffer, working_size, MPI_FLOAT,final_image ,working_size, MPI_FLOAT,0, MPI_COMM_WORLD);
+if (rank == 0){
+  for(int i = 1; i < nprocs; ++i){
+    MPI_Recv(buff, section_size, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    for (int j = 0; j< section_size; ++j){
+      final_image[(((nx_mpi*i)+1)*height) + j] = buff[j];
+    }
+  }
+}
 
-
-
-output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
-
-MPI_Finalize();
+else{
+  for (int i = 0; i < section_size; i++) {
+    buff[i] = image[start_pxl + i]
+  }
+  MPI_Send(buff,section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
+}
 
 // Output
 printf("------------------------------------\n");
@@ -166,8 +158,19 @@ printf(" runtime: %lf s\n", toc - tic);
 printf("------------------------------------\n");
 
 
+if (rank == 0){
+  output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
+}
+
+
+
+
+
   free(image);
   free(tmp_image);
+  free(final_image);
+
+  MPI_Finalize();
 
 }
 
@@ -176,10 +179,6 @@ void stencil(const int nx, const int ny, const int width, const int height,
 {
   float calc = 3.0/5.0;
   float calc2 = 0.5/5.0;
-
-
-
-
   for (int i = 1; i < ny + 1; ++i) {
     for (int j = 1; j < nx + 1; ++j) {
 
@@ -190,6 +189,53 @@ void stencil(const int nx, const int ny, const int width, const int height,
       // tmp_image[j + i * height] += image[j + 1 + i       * height] * calc2;
     }
   }
+
+
+}
+
+void stencil_mpi(const int nx, const int ny, const int width, const int height,
+             float* image, float* tmp_image, int rank, int nprocs)
+{
+  float calc = 3.0/5.0;
+  float calc2 = 0.5/5.0;
+
+  int start = 1 + (rank * nx);
+  int end = start + nx;
+
+
+  if (rank ==0){
+  for (int i = 1; i < ny + 1; ++i) {
+    for (int j = 1; j < end; ++j) {
+
+      tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
+
+    }
+  }
+}
+
+else if (rank == nproc -1){
+
+  for (int i = 1; i < ny + 1; ++i) {
+    for (int j = start; j < (width); ++j) {
+
+      tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
+
+    }
+  }
+
+}
+
+else{
+
+  for (int i = 1; i < ny + 1; ++i) {
+    for (int j = start; j < end; ++j) {
+
+      tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
+
+    }
+  }
+
+}
 
 
 }
