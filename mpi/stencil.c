@@ -188,8 +188,8 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
 
 else if (rank == nprocs -1){
 
-  for (int i = 1; i < ny + 1; ++i) {
-    for (int j = start; j < (width); ++j) {
+  for (int i = start; i < width; ++i) {
+    for (int j = 1; j < (ny+1); ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
 
