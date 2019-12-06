@@ -141,7 +141,7 @@ if (rank == 0){
 
   free(image);
   free(tmp_image);
-  free(final_image);
+
 
   MPI_Finalize();
 
