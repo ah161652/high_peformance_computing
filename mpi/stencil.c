@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
  free(image);
  free(tmp_image);
 
- return void;
+ return 0;
 
   }
 
