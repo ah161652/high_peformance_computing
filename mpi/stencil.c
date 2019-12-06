@@ -134,23 +134,23 @@ double tic = wtime();
 
 
 
-float* buff = malloc(sizeof(float)*section_size);
+float* final_buff = malloc(sizeof(float)*section_size);
 float* final_image = malloc(sizeof(float)*width*height);
 
 if (rank == 0){
   for(int i = 1; i < nprocs; ++i){
-    MPI_Recv(buff, section_size, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(final_buff, section_size, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< section_size; ++j){
-      final_image[(((nx_mpi*i)+1)*height) + j] = buff[j];
+      final_image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
     }
   }
 }
 
 else{
   for (int i = 0; i < section_size; i++) {
-    buff[i] = image[start_pxl + i];
+    final_buff[i] = image[start_pxl + i];
   }
-  MPI_Send(buff,section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
+  MPI_Send(final_buff,section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
 }
 
 // Output
