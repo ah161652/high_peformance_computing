@@ -178,7 +178,7 @@ void stencil(const int nx, const int ny, const int width, const int height,
   float calc2 = 0.5/5.0;
 
 
-if (rank == 0){
+
 
   for (int i = 1; i < ny + 1; ++i) {
     for (int j = 1; j < nx + 1; ++j) {
@@ -195,7 +195,6 @@ if (rank == 0){
 }
 
 
-}
 
 
 
