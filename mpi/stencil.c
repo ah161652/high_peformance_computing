@@ -132,7 +132,7 @@ printf("------------------------------------\n");
 
 
 if (rank == 0){
-  output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
+  output_image(OUTPUT_FILE, nx, ny, width, height, image);
 }
 
 
