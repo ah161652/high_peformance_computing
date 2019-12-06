@@ -24,6 +24,19 @@ int main(int argc, char* argv[])
     exit(EXIT_FAILURE);
   }
 
+  //MPI setup
+  MPI_Init(&argc, &argv);
+  int nprocs, rank, flag;
+
+  //Check if init worked
+  MPI_Initialized(&flag);
+  if ( flag != 1 ) {
+    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  }
+
+  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
   // Initiliase problem dimensions from command line arguments
   int nx = atoi(argv[1]);
   int ny = atoi(argv[2]);
@@ -39,36 +52,7 @@ int main(int argc, char* argv[])
   float* tmp_image = malloc(sizeof(float) * width * height);
 
 
-
-
-
-
-
-
-
-
-  //MPI setup
-  MPI_Init(&argc, &argv);
-  int nprocs, rank, flag;
-
-  //Check if init worked
-  MPI_Initialized(&flag);
-  if ( flag != 1 ) {
-    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
-  }
-
-  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-
   init_image(nx, ny, width, height, image, tmp_image);
-
-
-
-
-
-
-
 
 
   // if 1 processor then run sequentially
@@ -92,10 +76,6 @@ double tic = wtime();
 
  return 0;
   }
-
-
-
-
 
 
   // Split up columns
@@ -126,22 +106,14 @@ double tic = wtime();
   double toc = wtime();
 
 
-
-
-
-
-
-
-
-
 float* final_buff = malloc(sizeof(float)*section_size);
-float* final_image = malloc(sizeof(float)*width*height);
+
 
 if (rank == 0){
   for(int i = 1; i < nprocs; ++i){
     MPI_Recv(final_buff, section_size, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< section_size; ++j){
-      final_image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
+      image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
     }
   }
 }
