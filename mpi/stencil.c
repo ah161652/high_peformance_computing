@@ -94,7 +94,7 @@ double tic = wtime();
 
  float* buff = malloc(height*sizeof(float));
 
-
+  MPI_Barrier(MPI_COMM_WORLD);
    // Call the stencil kernel under mpi
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
