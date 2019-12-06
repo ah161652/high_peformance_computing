@@ -117,9 +117,9 @@ int main(int argc, char* argv[])
    // Call the stencil kernel under mpi
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, size);
+    stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, nprocs);
     //halo
-    stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , size);
+    stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , nprocs);
     //halo
   }
   double toc = wtime();
