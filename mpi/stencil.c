@@ -123,14 +123,14 @@ float* remainder_final_buff = malloc(sizeof(float)*remainder_section_size);
 
 if (rank == 0){
   for(int i = 1; i < nprocs - 1; ++i){
-    MPI_Recv(final_buff, section_size, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(final_buff, section_size, MPI_FLOAT, i,  MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< section_size; ++j){
       image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
     }
   }
 
 
-  MPI_Recv(remainder_final_buff, remainder_section_size, MPI_FLOAT, nprocs-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  MPI_Recv(remainder_final_buff, remainder_section_size, MPI_FLOAT, nprocs-1,  MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   for (int j = 0; j< remainder_section_size; ++j){
     image[(((nx_mpi*(nprocs-1))+1)*height) + j] = remainder_final_buff[j];
   }
@@ -142,7 +142,7 @@ else if (rank == nprocs -1){
   for (int i = 0; i < remainder_section_size; i++) {
     remainder_final_buff[i] = image[start_pxl + i];
   }
-  MPI_Send(remainder_final_buff ,remainder_section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
+  MPI_Send(remainder_final_buff ,remainder_section_size, MPI_FLOAT, 0,  MPI_ANY_TAG, MPI_COMM_WORLD);
 
 }
 
@@ -150,7 +150,7 @@ else{
   for (int i = 0; i < section_size; i++) {
     final_buff[i] = image[start_pxl + i];
   }
-  MPI_Send(final_buff,section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
+  MPI_Send(final_buff,section_size, MPI_FLOAT, 0,  MPI_ANY_TAG, MPI_COMM_WORLD);
 }
 
 // Output
@@ -238,8 +238,8 @@ else{
 void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size, int nprocs, int remainder_nx, int remainder_section_size)
 {
 if(rank == 0){
-  MPI_Sendrecv(&image[start_pxl + (nx_mpi-1)*height], height,  MPI_FLOAT, rank + 1, 0,
-               buff, height, MPI_FLOAT, rank+1, 0,
+  MPI_Sendrecv(&image[start_pxl + (nx_mpi-1)*height], height,  MPI_FLOAT, rank + 1,  MPI_ANY_TAG,
+               buff, height, MPI_FLOAT, rank+1,  MPI_ANY_TAG,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
                 for (int i = 0; i < height; ++i) {
@@ -249,8 +249,8 @@ if(rank == 0){
 }
 
 else if ( rank == nprocs - 1){
-  MPI_Sendrecv(&image[start_pxl], height,  MPI_FLOAT, rank - 1, 0,
-               buff, height, MPI_FLOAT, rank-1, 0,
+  MPI_Sendrecv(&image[start_pxl], height,  MPI_FLOAT, rank - 1,  MPI_ANY_TAG,
+               buff, height, MPI_FLOAT, rank-1,  MPI_ANY_TAG,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
                for (int i = 0; i < height; ++i) {
@@ -259,16 +259,16 @@ else if ( rank == nprocs - 1){
 }
 
 else {
-  MPI_Sendrecv(&image[start_pxl + ((nx_mpi - 1)*height)], height,  MPI_FLOAT, rank + 1, 0,
-               buff, height, MPI_FLOAT, rank-1, 0,
+  MPI_Sendrecv(&image[start_pxl + ((nx_mpi - 1)*height)], height,  MPI_FLOAT, rank + 1,  MPI_ANY_TAG,
+               buff, height, MPI_FLOAT, rank-1,  MPI_ANY_TAG,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
                for (int i = 0; i < height; ++i) {
                  image[start_pxl - height + i] = buff[i];
                }
 
- MPI_Sendrecv(&image[start_pxl], height,  MPI_FLOAT, rank - 1, 0,
-              buff, height, MPI_FLOAT, rank+1, 0,
+ MPI_Sendrecv(&image[start_pxl], height,  MPI_FLOAT, rank - 1,  MPI_ANY_TAG,
+              buff, height, MPI_FLOAT, rank+1,  MPI_ANY_TAG,
               MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
               for (int i = 0; i < height; ++i) {
