@@ -93,7 +93,7 @@ printf("DEBUG1\n" );
    nx_mpi = floor(nx/nprocs);
  }
  printf("DEBUG5\n" );
- printf("%s\n",nx_mpi);
+ printf("%d\n",nx_mpi);
 
  int section_size = height*nx_mpi;
 
