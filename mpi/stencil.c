@@ -130,18 +130,18 @@ if (rank == 0){
     }
   }
 
-  MPI_Recv(remainder_final_buff, remainder_section_size, MPI_FLOAT, nprocs-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  for (int j = 0; j< remainder_section_size; ++j){
-    image[(((nx_mpi*(nprocs-1))+1)*height) + j] = remainder_final_buff[j];
-  }
+  // MPI_Recv(remainder_final_buff, remainder_section_size, MPI_FLOAT, nprocs-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  // for (int j = 0; j< remainder_section_size; ++j){
+  //   image[(((nx_mpi*(nprocs-1))+1)*height) + j] = remainder_final_buff[j];
+  // }
 }
 
-else if (rank = nprocs -1){
-  for (int i = 0; i < remainder_section_size; i++) {
-    remainder_final_buff[i] = image[start_pxl + i];
-  }
-  MPI_Send(remainder_final_buff ,remainder_section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
-}
+// else if (rank = nprocs -1){
+//   for (int i = 0; i < remainder_section_size; i++) {
+//     remainder_final_buff[i] = image[start_pxl + i];
+//   }
+//   MPI_Send(remainder_final_buff ,remainder_section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
+// }
 
 else{
   for (int i = 0; i < section_size; i++) {
@@ -263,7 +263,7 @@ else if ( rank == nprocs - 1){
 }
 
 else {
-  MPI_Sendrecv(&image[start_pxl+ ((nx_mpi - 1)*height)], height,  MPI_FLOAT, rank + 1, 0,
+  MPI_Sendrecv(&image[start_pxl + ((nx_mpi - 1)*height)], height,  MPI_FLOAT, rank + 1, 0,
                buff, height, MPI_FLOAT, rank-1, 0,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
