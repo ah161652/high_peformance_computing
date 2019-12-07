@@ -15,7 +15,7 @@ void output_image(const char* file_name, const int nx, const int ny,
 double wtime(void);
 void stencil_mpi(const int nx, const int ny, const int width, const int height,
              float* image, float* tmp_image, int rank, int nprocs, int remainder_nx);
-void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size, int nprocs);
+void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size, int nprocs, int remainder_nx, int remainder_section_size);
 
 int main(int argc, char* argv[])
 {
@@ -104,13 +104,13 @@ double tic = wtime();
     stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, nprocs, remainder_nx);
     // MPI_Barrier(MPI_COMM_WORLD);
     // printf("DEBUG1");
-    halo(rank, tmp_image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
+    halo(rank, tmp_image, height, buff, start_pxl, nx_mpi, section_size, nprocs, remainder_nx, remainder_section_size);
     //   MPI_Barrier(MPI_COMM_WORLD);
     // printf("DEBUG2");
     stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , nprocs, remainder_nx);
     //   MPI_Barrier(MPI_COMM_WORLD);
     // printf("DEBUG3");
-    halo(rank, image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
+    halo(rank, image, height, buff, start_pxl, nx_mpi, section_size, nprocs, remainder_nx, remainder_section_size);
     //   MPI_Barrier(MPI_COMM_WORLD);
     // printf("DEBUG4");
   }
@@ -119,15 +119,28 @@ double tic = wtime();
 
 
 float* final_buff = malloc(sizeof(float)*section_size);
+float* remainder_final_buff = malloc(sizeof(float)*remainder_section_size);
 
 
 if (rank == 0){
-  for(int i = 1; i < nprocs; ++i){
+  for(int i = 1; i < nprocs - 1; ++i){
     MPI_Recv(final_buff, section_size, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< section_size; ++j){
       image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
     }
   }
+
+  MPI_Recv(remainder_final_buff, remainder_section_size, MPI_FLOAT, nprocs-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  for (int j = 0; j< remainder_section_size; ++j){
+    image[(((nx_mpi*(nprocs-1))+1)*height) + j] = remainder_final_buff[j];
+  }
+}
+
+else if (rank = nprocs -1){
+  for (int i = 0; i < remainder_section_size; i++) {
+    remainder_final_buff[i] = image[start_pxl + i];
+  }
+  MPI_Send(remainder_final_buff ,remainder_section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
 }
 
 else{
@@ -226,7 +239,7 @@ else{
 
 }
 
-void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size, int nprocs)
+void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size, int nprocs, int remainder_nx, int remainder_section_size)
 {
 if(rank == 0){
   MPI_Sendrecv(&image[start_pxl + (nx_mpi-1)*height], height,  MPI_FLOAT, rank + 1, 0,
