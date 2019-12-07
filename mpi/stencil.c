@@ -92,7 +92,7 @@ printf("DEBUG1\n" );
  else{
    nx_mpi = floor(nx/nprocs);
  }
- printf("DEBUG5\n" );
+
  printf("%d\n",nx_mpi);
 
  int section_size = height*nx_mpi;
@@ -104,6 +104,8 @@ printf("DEBUG1\n" );
 
   MPI_Barrier(MPI_COMM_WORLD);
    // Call the stencil kernel under mpi
+
+    printf("DEBUG5\n" );
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
     stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, nprocs);
@@ -112,6 +114,7 @@ printf("DEBUG1\n" );
     halo(rank, image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
   }
   double toc = wtime();
+   printf("DEBUG6\n" );
 
 
 float* final_buff = malloc(sizeof(float)*section_size);
