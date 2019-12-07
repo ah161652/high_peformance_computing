@@ -130,22 +130,22 @@ if (rank == 0){
     }
   }
 
-  printf("debug1\n");
+
 
   MPI_Recv(remainder_final_buff, remainder_section_size, MPI_FLOAT, nprocs-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   for (int j = 0; j< remainder_section_size; ++j){
     image[(((nx_mpi*(nprocs-1))+1)*height) + j] = remainder_final_buff[j];
   }
 
-  printf("debug2\n");
+
 }
 
-else if (rank = nprocs -1){
+else if (rank == nprocs -1){
   for (int i = 0; i < remainder_section_size; i++) {
     remainder_final_buff[i] = image[start_pxl + i];
   }
   MPI_Send(remainder_final_buff ,remainder_section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
-  printf("debug3\n");
+
 }
 
 else{
