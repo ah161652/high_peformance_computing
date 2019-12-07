@@ -81,8 +81,9 @@ printf("DEBUG1\n" );
 
   // Split up columns
   int nx_mpi;
+  int remainder = nx % nprocs;
  if(rank == nprocs - 1){
-   nx_mpi = (nx/nprocs) + (nx%nprocs);
+   nx_mpi = (nx/nprocs) + remainder;
  }
  else{
    nx_mpi = nx/nprocs;
