@@ -116,7 +116,7 @@ double tic = wtime();
   }
   double toc = wtime();
 
-
+  MPI_Barrier(MPI_COMM_WORLD);
 
 float* final_buff = malloc(sizeof(float)*section_size);
 float* remainder_final_buff = malloc(sizeof(float)*remainder_section_size);
