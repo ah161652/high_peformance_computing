@@ -87,6 +87,8 @@ double tic = wtime();
    nx_mpi = nx/nprocs;
  }
 
+ printf("%s\n",nx_mpi);
+
  int section_size = height*nx_mpi;
 
  //define starting pixel
