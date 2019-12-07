@@ -96,7 +96,6 @@ double tic = wtime();
   MPI_Barrier(MPI_COMM_WORLD);
    // Call the stencil kernel under mpi
 
-
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
     stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, nprocs, remainder_nx);
@@ -114,7 +113,7 @@ double tic = wtime();
   }
   double toc = wtime();
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  //MPI_Barrier(MPI_COMM_WORLD);
 
 float* final_buff = malloc(sizeof(float)*section_size);
 float* remainder_final_buff = malloc(sizeof(float)*remainder_section_size);
