@@ -78,16 +78,16 @@ double tic = wtime();
  return 0;
   }
 
-printf("DEBUG1\n" );
+
 
   // Split up columns
   int nx_mpi;
   int remainder = nx % nprocs;
-  printf("DEBUG2\n" );
+
  if(rank == nprocs - 1){
-   printf("DEBUG3\n" );
+
    nx_mpi = floor(nx/nprocs) + remainder;
-   printf("DEBUG4\n" );
+
  }
  else{
    nx_mpi = floor(nx/nprocs);
@@ -105,16 +105,20 @@ printf("DEBUG1\n" );
   MPI_Barrier(MPI_COMM_WORLD);
    // Call the stencil kernel under mpi
 
-    printf("DEBUG5\n" );
+
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
     stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, nprocs);
+    printf("DEBUG1");
     halo(rank, tmp_image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
+    printf("DEBUG2");
     stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , nprocs);
+    printf("DEBUG3");
     halo(rank, image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
+    printf("DEBUG4");
   }
   double toc = wtime();
-   printf("DEBUG6\n" );
+
 
 
 float* final_buff = malloc(sizeof(float)*section_size);
