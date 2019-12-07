@@ -6,6 +6,7 @@
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
 
+//
 void stencil(const int nx, const int ny, const int width, const int height,
              float* image, float* tmp_image);
 void init_image(const int nx, const int ny, const int width, const int height,
@@ -78,8 +79,6 @@ double tic = wtime();
  return 0;
   }
 
-
-
   // Split up columns
   int nx_mpi = floor(nx/nprocs);
   int remainder = nx % nprocs;
@@ -131,7 +130,6 @@ if (rank == 0){
   }
 
 
-
   MPI_Recv(remainder_final_buff, remainder_section_size, MPI_FLOAT, nprocs-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   for (int j = 0; j< remainder_section_size; ++j){
     image[(((nx_mpi*(nprocs-1))+1)*height) + j] = remainder_final_buff[j];
@@ -165,10 +163,6 @@ if (rank == 0){
   output_image(OUTPUT_FILE, nx, ny, width, height, image);
 }
 
-
-
-
-
   free(image);
   free(tmp_image);
 
@@ -186,10 +180,7 @@ void stencil(const int nx, const int ny, const int width, const int height,
     for (int j = 1; j < nx + 1; ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
-      // tmp_image[j + i * height] += (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2);
-      // tmp_image[j + i * height] += image[j     + (i + 1) * height] * calc2;
-      // tmp_image[j + i * height] += image[j - 1 + i       * height] * calc2;
-      // tmp_image[j + i * height] += image[j + 1 + i       * height] * calc2;
+
     }
   }
 
@@ -288,10 +279,6 @@ else {
 
 }
 }
-
-
-
-
 
 
 // Create the input image
