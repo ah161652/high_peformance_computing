@@ -14,7 +14,7 @@ void output_image(const char* file_name, const int nx, const int ny,
                   const int width, const int height, float* image);
 double wtime(void);
 void stencil_mpi(const int nx, const int ny, const int width, const int height,
-             float* image, float* tmp_image, int rank, int nprocs);
+             float* image, float* tmp_image, int rank, int nprocs, int remainder_nx);
 void halo(int rank, float* image, int height, float* buff, int start_pxl, int nx_mpi, int section_size, int nprocs);
 
 int main(int argc, char* argv[])
@@ -81,21 +81,14 @@ double tic = wtime();
 
 
   // Split up columns
-  int nx_mpi;
+  int nx_mpi = floor(nx/nprocs);
   int remainder = nx % nprocs;
-
- if(rank == nprocs - 1){
-
-   nx_mpi = floor(nx/nprocs) + remainder;
-
- }
- else{
-   nx_mpi = floor(nx/nprocs);
- }
+  int remainder_nx = nx_mpi + remainder
 
  printf("%d\n",nx_mpi);
 
  int section_size = height*nx_mpi;
+ int remainder_section_size = height * remainder_nx;
 
  //define starting pixel
  int start_pxl = ((rank*nx_mpi)+1)*height;
@@ -108,13 +101,13 @@ double tic = wtime();
 
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
-    stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, nprocs);
+    stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, nprocs, remainder_nx);
     // MPI_Barrier(MPI_COMM_WORLD);
     // printf("DEBUG1");
     halo(rank, tmp_image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
     //   MPI_Barrier(MPI_COMM_WORLD);
     // printf("DEBUG2");
-    stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , nprocs);
+    stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , nprocs, remainder_nx);
     //   MPI_Barrier(MPI_COMM_WORLD);
     // printf("DEBUG3");
     halo(rank, image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
@@ -186,13 +179,14 @@ void stencil(const int nx, const int ny, const int width, const int height,
 }
 
 void stencil_mpi(const int nx, const int ny, const int width, const int height,
-             float* image, float* tmp_image, int rank, int nprocs)
+             float* image, float* tmp_image, int rank, int nprocs, int remainder_nx)
 {
   float calc = 3.0/5.0;
   float calc2 = 0.5/5.0;
 
   int start = 1 + (rank * nx);
   int end = start + nx;
+  int remainder_end = start + remainder_nx;
 
 
   if (rank ==0){
@@ -207,7 +201,7 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
 
 else if (rank == nprocs -1){
 
-  for (int i = start - 1; i < width; ++i) {
+  for (int i = start; i < remainder_end; ++i) {
     for (int j = 1; j <  ny + 1; ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
