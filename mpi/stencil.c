@@ -123,25 +123,30 @@ float* remainder_final_buff = malloc(sizeof(float)*remainder_section_size);
 
 
 if (rank == 0){
-  for(int i = 1; i < nprocs /*- 1*/; ++i){
+  for(int i = 1; i < nprocs - 1; ++i){
     MPI_Recv(final_buff, section_size, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< section_size; ++j){
       image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
     }
   }
 
-  // MPI_Recv(remainder_final_buff, remainder_section_size, MPI_FLOAT, nprocs-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  // for (int j = 0; j< remainder_section_size; ++j){
-  //   image[(((nx_mpi*(nprocs-1))+1)*height) + j] = remainder_final_buff[j];
-  // }
+  printf("debug1\n");
+
+  MPI_Recv(remainder_final_buff, remainder_section_size, MPI_FLOAT, nprocs-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  for (int j = 0; j< remainder_section_size; ++j){
+    image[(((nx_mpi*(nprocs-1))+1)*height) + j] = remainder_final_buff[j];
+  }
+
+  printf("debug2\n");
 }
 
-// else if (rank = nprocs -1){
-//   for (int i = 0; i < remainder_section_size; i++) {
-//     remainder_final_buff[i] = image[start_pxl + i];
-//   }
-//   MPI_Send(remainder_final_buff ,remainder_section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
-// }
+else if (rank = nprocs -1){
+  for (int i = 0; i < remainder_section_size; i++) {
+    remainder_final_buff[i] = image[start_pxl + i];
+  }
+  MPI_Send(remainder_final_buff ,remainder_section_size, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
+  printf("debug3\n");
+}
 
 else{
   for (int i = 0; i < section_size; i++) {
