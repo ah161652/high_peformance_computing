@@ -83,7 +83,7 @@ double tic = wtime();
   // Split up columns
   int nx_mpi = floor(nx/nprocs);
   int remainder = nx % nprocs;
-  int remainder_nx = nx_mpi + remainder
+  int remainder_nx = nx_mpi + remainder;
 
  printf("%d\n",nx_mpi);
 
