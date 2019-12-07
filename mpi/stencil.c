@@ -84,12 +84,14 @@ printf("DEBUG1\n" );
   int remainder = nx % nprocs;
   printf("DEBUG2\n" );
  if(rank == nprocs - 1){
+   printf("DEBUG3\n" );
    nx_mpi = (nx/nprocs) + remainder;
+   printf("DEBUG4\n" );
  }
  else{
    nx_mpi = nx/nprocs;
  }
-
+printf("DEBUG5\n" );
  printf("%s\n",nx_mpi);
 
  int section_size = height*nx_mpi;
