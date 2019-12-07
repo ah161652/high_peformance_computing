@@ -77,6 +77,7 @@ double tic = wtime();
  return 0;
   }
 
+printf("DEBUG1\n" );
 
   // Split up columns
   int nx_mpi;
