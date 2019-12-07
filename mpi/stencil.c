@@ -123,7 +123,7 @@ float* remainder_final_buff = malloc(sizeof(float)*remainder_section_size);
 
 
 if (rank == 0){
-  for(int i = 1; i < nprocs - 1; ++i){
+  for(int i = 1; i < nprocs /*- 1*/; ++i){
     MPI_Recv(final_buff, section_size, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< section_size; ++j){
       image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
