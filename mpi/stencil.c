@@ -109,17 +109,17 @@ double tic = wtime();
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
     stencil_mpi(nx_mpi, ny, width, height, image, tmp_image, rank, nprocs);
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("DEBUG1");
+    // MPI_Barrier(MPI_COMM_WORLD);
+    // printf("DEBUG1");
     halo(rank, tmp_image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
-      MPI_Barrier(MPI_COMM_WORLD);
-    printf("DEBUG2");
+    //   MPI_Barrier(MPI_COMM_WORLD);
+    // printf("DEBUG2");
     stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , nprocs);
-      MPI_Barrier(MPI_COMM_WORLD);
-    printf("DEBUG3");
+    //   MPI_Barrier(MPI_COMM_WORLD);
+    // printf("DEBUG3");
     halo(rank, image, height, buff, start_pxl, nx_mpi, section_size, nprocs);
-      MPI_Barrier(MPI_COMM_WORLD);
-    printf("DEBUG4");
+    //   MPI_Barrier(MPI_COMM_WORLD);
+    // printf("DEBUG4");
   }
   double toc = wtime();
 
@@ -207,7 +207,7 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
 
 else if (rank == nprocs -1){
 
-  for (int i = start; i < end; ++i) {
+  for (int i = start - 1; i < width; ++i) {
     for (int j = 1; j <  ny + 1; ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
