@@ -18,7 +18,7 @@ double wtime(void);
 void stencil_mpi(const int nx, const int ny, const int width, const int height,
              float* image, float* tmp_image, int rank, int size, int remainder_nx);
 void halo(int rank, float* image, int height, int fist_pxl, int nx_mpi, int ncolumn_pxls, int size, int remainder_nx, int remainder_ncolumn_pxls);
-void recombine(int rank, int size, int width, int height, float* final_image, float* image, float* final_buff, int ncolumn_pxls, float* remainder_final_buff, int remainder_ncolumn_pxls, int nx_mpi);
+void recombine(int rank, int size, int width, int height, float* final_image, float* image, float* final_buff, int ncolumn_pxls, float* remainder_final_buff, int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl);
 
 int main(int argc, char* argv[])
 {
@@ -149,7 +149,7 @@ double tic = wtime();
   float* remainder_final_buff = malloc(sizeof(float)*remainder_ncolumn_pxls);
   float* final_image = malloc(sizeof(float) * width * height);
 
-  recombine(rank, size, width, height, final_image, image, final_buff, ncolumn_pxls, remainder_final_buff, remainder_ncolumn_pxls, nx_mpi);
+  recombine(rank, size, width, height, final_image, image, final_buff, ncolumn_pxls, remainder_final_buff, remainder_ncolumn_pxls, nx_mpi, fist_pxl);
 
 
   //***********************************//
@@ -296,7 +296,7 @@ else {
 
 }
 
-void recombine(int rank, int size, int width, int height, float* final_image, float* image, float* final_buff, int ncolumn_pxls, float* remainder_final_buff, int remainder_ncolumn_pxls, int nx_mpi){
+void recombine(int rank, int size, int width, int height, float* final_image, float* image, float* final_buff, int ncolumn_pxls, float* remainder_final_buff, int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl){
   if (rank == 0){
 
     for (int j = 0; j< width*height; ++j){
