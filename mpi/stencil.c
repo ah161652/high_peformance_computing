@@ -38,17 +38,21 @@ int main(int argc, char* argv[])
 
   //MPI init
   MPI_Init(&argc, &argv);
-  const int size, rank, flag;
+  int mpi_size, mpi_rank, mpi_flag;
 
   //Check if init worked
-  MPI_Initialized(&flag);
-  if ( flag != 1 ) {
+  MPI_Initialized(&mpi_flag);
+  if ( mpi_flag != 1 ) {
     MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
   }
 
   // MPI size and rank
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+
+  enum mpi_variables{
+    size = mpi_size, rank = mpi_rank
+  };
 
   //***********************************//
 
