@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 
   //MPI init
   MPI_Init(&argc, &argv);
-  int size, rank, flag;
+  const int size, rank, flag;
 
   //Check if init worked
   MPI_Initialized(&flag);
