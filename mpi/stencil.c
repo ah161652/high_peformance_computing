@@ -153,7 +153,7 @@ double tic = wtime();
 
 
   if (rank == 0){
-    for (int j = 0; j< ncolumn_pxls; ++j){
+    for (int j = 0; j< width*height; ++j){
       final_image[j] = image[j];
     }
 
