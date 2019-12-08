@@ -80,7 +80,6 @@ int main(int argc, char* argv[])
 
   //****** Serial run for 1 core ******//
 
-// COULD USE A SERIAL FUNCTION
   // if 1 core then run without mpi
   if (size == 1){
 
@@ -150,20 +149,27 @@ double tic = wtime();
   // COULD USE FINAL IMAGE INSTEAD
   float* final_buff = malloc(sizeof(float)*ncolumn_pxls);
   float* remainder_final_buff = malloc(sizeof(float)*remainder_ncolumn_pxls);
+  float* final_image = malloc(sizeof(float) * width * height);
 
-  //Stitch function + switch statements
+
   if (rank == 0){
+    for (int j = 0; j< ncolumn_pxls; ++j){
+      final_image[j] = image[j]
+    }
+
+
+
     for(int i = 1; i < size - 1; ++i){
       MPI_Recv(final_buff, ncolumn_pxls, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       for (int j = 0; j< ncolumn_pxls; ++j){
-        image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
+        final_image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
       }
     }
 
 
     MPI_Recv(remainder_final_buff, remainder_ncolumn_pxls, MPI_FLOAT, size-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< remainder_ncolumn_pxls; ++j){
-      image[(((nx_mpi*(size-1))+1)*height) + j] = remainder_final_buff[j];
+      final_image[(((nx_mpi*(size-1))+1)*height) + j] = remainder_final_buff[j];
     }
 
   }
@@ -192,7 +198,7 @@ double tic = wtime();
   //****** Output Image, time, and free memory ******//
 
   if (rank == 0){
-    output_image(OUTPUT_FILE, nx, ny, width, height, image);
+    output_image(OUTPUT_FILE, nx, ny, width, height, final_image);
 
     printf("------------------------------------\n");
     printf(" runtime: %lf s\n", toc - tic);
@@ -201,6 +207,7 @@ double tic = wtime();
 
   free(image);
   free(tmp_image);
+  free(final_image)
 
   MPI_Finalize();
 
@@ -233,8 +240,6 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
   int start = 1 + (rank * nx);
   int end = start + nx;
   int remainder_end = start + remainder_nx;
-
-  //SWITCH STATEMENT
 
   if (rank ==0){
   for (int i = 1; i < end; ++i) {
@@ -276,7 +281,6 @@ else{
 void halo(int rank, float* image, int height, int fist_pxl, int nx_mpi, int ncolumn_pxls, int size, int remainder_nx, int remainder_ncolumn_pxls)
 {
 
-//SWITCH STATEMENT
 float* buff = malloc(height*sizeof(float));
 
 if(rank == 0){
