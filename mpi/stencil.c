@@ -145,13 +145,15 @@ double tic = wtime();
 
   //****** Recombine image ******//
 
-
   // COULD USE FINAL IMAGE INSTEAD
   float* final_buff = malloc(sizeof(float)*ncolumn_pxls);
   float* remainder_final_buff = malloc(sizeof(float)*remainder_ncolumn_pxls);
 
-  //Stitch function + switch statements
-  if (rank == 0){
+  //Stitch function
+
+  switch (rank) {
+
+    case 0:
     for(int i = 1; i < size - 1; ++i){
       MPI_Recv(final_buff, ncolumn_pxls, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       for (int j = 0; j< ncolumn_pxls; ++j){
@@ -159,36 +161,30 @@ double tic = wtime();
       }
     }
 
-
     MPI_Recv(remainder_final_buff, remainder_ncolumn_pxls, MPI_FLOAT, size-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< remainder_ncolumn_pxls; ++j){
       image[(((nx_mpi*(size-1))+1)*height) + j] = remainder_final_buff[j];
     }
+    break;
 
-  }
-
-  else if (rank == size -1){
+    case (size -1):
     for (int i = 0; i < remainder_ncolumn_pxls; i++) {
       remainder_final_buff[i] = image[fist_pxl + i];
     }
     MPI_Send(remainder_final_buff ,remainder_ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
+    break;
 
-  }
-
-  else{
+    default:
     for (int i = 0; i < ncolumn_pxls; i++) {
       final_buff[i] = image[fist_pxl + i];
     }
     MPI_Send(final_buff,ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
   }
 
+
+  }
+
   //***********************************//
-
-
-  //DELETE ONCE TESTED THAT ALL ARE SAME
-  printf("------------------------------------\n");
-  printf(" runtime: %lf s\n", toc - tic);
-  printf("------------------------------------\n");
 
 
 
@@ -199,7 +195,7 @@ double tic = wtime();
     output_image(OUTPUT_FILE, nx, ny, width, height, image);
 
     printf("------------------------------------\n");
-    printf(" FINAL runtime: %lf s\n", toc - tic);
+    printf(" runtime: %lf s\n", toc - tic);
     printf("------------------------------------\n");
   }
 
@@ -238,53 +234,49 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
   int end = start + nx;
   int remainder_end = start + remainder_nx;
 
-  //SWITCH STATEMENT
+  switch (rank) {
 
-  if (rank ==0){
-  for (int i = 1; i < end; ++i) {
-    for (int j = 1; j < ny + 1; ++j) {
+    case 0:
+    for (int i = 1; i < end; ++i) {
+      for (int j = 1; j < ny + 1; ++j) {
 
-      tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
+        tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
 
+      }
     }
-  }
-}
+    break;
 
-else if (rank == size -1){
+    case (size -1):
+    for (int i = start; i < remainder_end; ++i) {
+      for (int j = 1; j <  ny + 1; ++j) {
 
-  for (int i = start; i < remainder_end; ++i) {
-    for (int j = 1; j <  ny + 1; ++j) {
+        tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
 
-      tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
-
+      }
     }
-  }
+    break;
 
-}
+    default:
+    for (int i = start; i < end; ++i) {
+      for (int j = 1; j < ny + 1; ++j) {
 
-else{
+        tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
 
-  for (int i = start; i < end; ++i) {
-    for (int j = 1; j < ny + 1; ++j) {
-
-      tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
-
+      }
     }
+
   }
-
-}
-
 
 }
 
 void halo(int rank, float* image, int height, int fist_pxl, int nx_mpi, int ncolumn_pxls, int size, int remainder_nx, int remainder_ncolumn_pxls)
 {
 
-//SWITCH STATEMENT
 float* buff = malloc(height*sizeof(float));
-
-if(rank == 0){
 //FIND FIRST HALO CELL VIA nx_mpi rather than first pxl
+switch (rank) {
+
+  case 0:
   // Send right, receieve right, place in right halo column
   MPI_Sendrecv(&image[fist_pxl + (nx_mpi-1)*height], height,  MPI_FLOAT, rank + 1, 0,
                buff, height, MPI_FLOAT, rank+1, 0,
@@ -293,11 +285,9 @@ if(rank == 0){
                 for (int i = 0; i < height; ++i) {
                   image[fist_pxl + ncolumn_pxls + i] = buff[i];
                 }
+  break;
 
-}
-
-else if ( rank == size - 1){
-
+  case (size -1):
   // Send left, recieve left, place in left halo column
   MPI_Sendrecv(&image[fist_pxl], height,  MPI_FLOAT, rank - 1, 0,
                buff, height, MPI_FLOAT, rank-1, 0,
@@ -306,10 +296,9 @@ else if ( rank == size - 1){
                for (int i = 0; i < height; ++i) {
                  image[fist_pxl - height + i] = buff[i];
 }
-}
+  break;
 
-else {
-
+  default:
   //Send left, receieve right, place in right halo column
   MPI_Sendrecv(&image[fist_pxl], height,  MPI_FLOAT, rank - 1, 0,
                buff, height, MPI_FLOAT, rank+1, 0,
@@ -329,7 +318,6 @@ else {
                }
 
 }
-
 
 }
 
