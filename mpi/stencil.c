@@ -207,7 +207,7 @@ double tic = wtime();
 
   free(image);
   free(tmp_image);
-  free(final_image)
+  free(final_image);
 
   MPI_Finalize();
 
