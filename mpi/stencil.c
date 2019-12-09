@@ -126,7 +126,7 @@ double tic = wtime();
 
   // Define number of pixels in each column section
   int ncolumn_pxls = height*nx_mpi;
-  int remainder_ncolumn_pxls = height * remainder_nx * 2;
+  int remainder_ncolumn_pxls = height * remainder_nx;
 
   // Define the first pixel in each column section, and the first pixel for each halo region.
   int fist_pxl = ((rank*nx_mpi)+1)*height;
@@ -219,7 +219,7 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
   int start = 1 + (rank * nx);
   int end = start + nx;
   int remainder_start = width -1 - remainder_nx;
-  int remainder_end = start + remainder_nx;
+  int remainder_end = remainder_start + remainder_nx;
 
   if (rank ==0){
   for (int i = 1; i < end; ++i) {
@@ -247,7 +247,7 @@ else if (rank != size -1){
 
 else{
 
-  for (int i = start; i < remainder_end; ++i) {
+  for (int i = remainder_start; i < remainder_end; ++i) {
     for (int j = 1; j <  ny + 1; ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
