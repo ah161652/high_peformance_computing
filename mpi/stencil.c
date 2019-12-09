@@ -116,12 +116,12 @@ double tic = wtime();
   else remainder_nx = remainder;
 
   if (remainder == 0){
-   nx_mpi = floor(nx/(size));
+   nx_mpi = nx/(size);
    remainder_nx = nx_mpi;
   }
 
   else{
-    nx_mpi =ceil(nx/(size-1));
+    nx_mpi = (nx-remainder) / size;
     remainder_nx = remainder;
   }
 
