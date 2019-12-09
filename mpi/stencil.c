@@ -109,11 +109,21 @@ double tic = wtime();
   //****** Define MPI related variables ******//
 
   // Split up columns, and remainder column
-  int nx_mpi = floor(nx/(size-1));
+  int nx_mpi;
   int remainder = nx % size;
   int remainder_nx;
   if (remainder == 0) remainder_nx = nx_mpi;
   else remainder_nx = remainder;
+
+  if (remainder == 0){
+   nx_mpi = floor(nx/(size));
+   remainder_nx = nx_mpi;
+  }
+
+  else{
+    nx_mpi =floor(nx/(size-1);
+    remainder_nx = remainder;
+  }
 
   // Define number of pixels in each column section
   int ncolumn_pxls = height*nx_mpi;
