@@ -219,7 +219,21 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
   }
 }
 
-else if (rank == size -1){
+else if (rank != size -1){
+
+  for (int i = start; i < end; ++i) {
+    for (int j = 1; j < ny + 1; ++j) {
+
+      tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
+
+    }
+  }
+
+
+
+}
+
+else{
 
   for (int i = start; i < remainder_end; ++i) {
     for (int j = 1; j <  ny + 1; ++j) {
@@ -229,17 +243,7 @@ else if (rank == size -1){
     }
   }
 
-}
 
-else{
-
-  for (int i = start; i < end; ++i) {
-    for (int j = 1; j < ny + 1; ++j) {
-
-      tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
-
-    }
-  }
 
 }
 
@@ -258,13 +262,37 @@ if(rank == 0){
                buff, height, MPI_FLOAT, rank+1, 0,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
+
                 for (int i = 0; i < height; ++i) {
                   image[first_halo_pixel_right + i] = buff[i];
                 }
 
 }
 
-else if ( rank == size - 1){
+else if ( rank != size - 1){
+
+
+//Send left, receieve right, place in right halo column
+MPI_Sendrecv(&image[last_col_left_first_pixel], height,  MPI_FLOAT, rank - 1, 0,
+             buff, height, MPI_FLOAT, rank+1, 0,
+             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+             for (int i = 0; i < height; ++i) {
+               image[first_halo_pixel_right + i] = buff[i];
+             }
+
+// Send right, receieve left, place in left halo column
+MPI_Sendrecv(&image[last_col_right_first_pixel], height,  MPI_FLOAT, rank + 1, 0,
+             buff, height, MPI_FLOAT, rank-1, 0,
+             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+             for (int i = 0; i < height; ++i) {
+               image[first_halo_pixl_left + i] = buff[i];
+             }
+
+}
+
+else {
 
   // Send left, recieve left, place in left halo column
   MPI_Sendrecv(&image[last_col_left_first_pixel], height,  MPI_FLOAT, rank - 1, 0,
@@ -274,29 +302,10 @@ else if ( rank == size - 1){
                for (int i = 0; i < height; ++i) {
                  image[first_halo_pixl_left + i] = buff[i];
 }
-}
-
-else {
-
-  //Send left, receieve right, place in right halo column
-  MPI_Sendrecv(&image[last_col_left_first_pixel], height,  MPI_FLOAT, rank - 1, 0,
-               buff, height, MPI_FLOAT, rank+1, 0,
-               MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-               for (int i = 0; i < height; ++i) {
-                 image[first_halo_pixel_right + i] = buff[i];
-               }
-
-  // Send right, receieve left, place in left halo column
-  MPI_Sendrecv(&image[last_col_right_first_pixel], height,  MPI_FLOAT, rank + 1, 0,
-               buff, height, MPI_FLOAT, rank-1, 0,
-               MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-               for (int i = 0; i < height; ++i) {
-                 image[first_halo_pixl_left + i] = buff[i];
-               }
 
 }
+
+
 
 
 }
@@ -312,6 +321,7 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
     for(int i = 1; i < size - 1; ++i){
       MPI_Recv(final_buff, ncolumn_pxls, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       for (int j = 0; j< ncolumn_pxls; ++j){
+        ///CHANGE
         final_image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
       }
     }
@@ -319,6 +329,7 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
 
     MPI_Recv(remainder_final_buff, remainder_ncolumn_pxls, MPI_FLOAT, size-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< remainder_ncolumn_pxls; ++j){
+      //CHANGE
       final_image[(((nx_mpi*(size-1))+1)*height) + j] = remainder_final_buff[j];
     }
 
