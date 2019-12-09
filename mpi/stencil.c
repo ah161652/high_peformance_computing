@@ -111,8 +111,9 @@ double tic = wtime();
   // Split up columns, and remainder column
   int nx_mpi = floor(nx/(size-1));
   int remainder = nx % size;
+  int remainder_nx;
   if (remainder == 0) remainder_nx = nx_mpi;
-  else int remainder_nx = remainder;
+  else remainder_nx = remainder;
 
   // Define number of pixels in each column section
   int ncolumn_pxls = height*nx_mpi;
