@@ -121,12 +121,12 @@ double tic = wtime();
 
   else{
     nx_mpi = (nx-remainder) / (size-1);
-    remainder_nx = remainder*2;
+    remainder_nx = remainder;
   }
 
   // Define number of pixels in each column section
   int ncolumn_pxls = height*nx_mpi;
-  int remainder_ncolumn_pxls = height * remainder_nx;
+  int remainder_ncolumn_pxls = height * remainder_nx * 2;
 
   // Define the first pixel in each column section, and the first pixel for each halo region.
   int fist_pxl = ((rank*nx_mpi)+1)*height;
