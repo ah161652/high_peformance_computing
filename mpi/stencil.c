@@ -247,7 +247,7 @@ else if (rank != size -1){
 
 else{
 
-  for (int i = remainder_start; i < remainder_end; ++i) {
+  for (int i = start; i < remainder_end; ++i) {
     for (int j = 1; j <  ny + 1; ++j) {
 
       tmp_image[j + i * height] =  (image[j     + i       * height] * calc) + (image[j     + (i - 1) * height] * calc2) + (image[j     + (i + 1) * height] * calc2) + (image[j - 1 + i       * height] * calc2) + (image[j + 1 + i       * height] * calc2) ;
