@@ -111,7 +111,8 @@ double tic = wtime();
   // Split up columns, and remainder column
   int nx_mpi = floor(nx/(size-1));
   int remainder = nx % size;
-  int remainder_nx = remainder;
+  if (remainder == 0) remainder_nx = nx_mpi;
+  else int remainder_nx = remainder;
 
   // Define number of pixels in each column section
   int ncolumn_pxls = height*nx_mpi;
@@ -207,7 +208,6 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
 
   int start = 1 + (rank * nx);
   int end = start + nx;
-  int remainder_start = start + 1;
   int remainder_end = start + remainder_nx;
 
   if (rank ==0){
