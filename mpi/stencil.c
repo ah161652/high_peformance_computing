@@ -120,8 +120,8 @@ double tic = wtime();
   }
 
   else{
-    nx_mpi = (nx-remainder) / (size-1);
-    remainder_nx = remainder;
+    nx_mpi = (nx-remainder) / (size);
+    remainder_nx = remainder + nx_mpi;
   }
 
   // Define number of pixels in each column section
