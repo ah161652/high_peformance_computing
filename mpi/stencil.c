@@ -131,8 +131,6 @@ double tic = wtime();
 
   //****** Run stencil / halo exhange under MPI while timed ******//
 
-  float* buff = malloc(height*sizeof(float));
-
   MPI_Barrier(MPI_COMM_WORLD);
   double tic = wtime();
   for (int t = 0; t < niters; ++t) {
@@ -255,7 +253,7 @@ else{
 void halo(int rank, float* image, int height, int fist_pxl, int nx_mpi, int ncolumn_pxls, int size, int remainder_nx, int remainder_ncolumn_pxls, int last_col_right_first_pixel, int last_col_left_first_pixel, int first_halo_pixel_right, int first_halo_pixl_left)
 {
 
-
+float* buff = malloc(height*sizeof(float));
 
 if(rank == 0){
 
