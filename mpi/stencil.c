@@ -121,7 +121,7 @@ double tic = wtime();
   }
 
   else{
-    nx_mpi = (nx-remainder) / size;
+    nx_mpi = (nx-remainder) / (size-1);
     remainder_nx = remainder;
   }
 
