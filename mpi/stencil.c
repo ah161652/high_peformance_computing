@@ -109,9 +109,9 @@ double tic = wtime();
   //****** Define MPI related variables ******//
 
   // Split up columns, and remainder column
-  int nx_mpi = floor(nx/size);
+  int nx_mpi = floor(nx/(size-1));
   int remainder = nx % size;
-  int remainder_nx = nx_mpi + remainder;
+  int remainder_nx = remainder;
 
   // Define number of pixels in each column section
   int ncolumn_pxls = height*nx_mpi;
@@ -130,6 +130,8 @@ double tic = wtime();
 
 
   //****** Run stencil / halo exhange under MPI while timed ******//
+
+  float* buff = malloc(height*sizeof(float));
 
   MPI_Barrier(MPI_COMM_WORLD);
   double tic = wtime();
@@ -253,7 +255,7 @@ else{
 void halo(int rank, float* image, int height, int fist_pxl, int nx_mpi, int ncolumn_pxls, int size, int remainder_nx, int remainder_ncolumn_pxls, int last_col_right_first_pixel, int last_col_left_first_pixel, int first_halo_pixel_right, int first_halo_pixl_left)
 {
 
-float* buff = malloc(height*sizeof(float));
+
 
 if(rank == 0){
 
@@ -335,19 +337,24 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
 
   }
 
-  else if (rank == size -1){
+  else if (rank != size -1){
+
+
+    for (int i = 0; i < ncolumn_pxls; i++) {
+      final_buff[i] = image[fist_pxl + i];
+    }
+    MPI_Send(final_buff,ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
+
+
+  }
+
+  else{
+
     for (int i = 0; i < remainder_ncolumn_pxls; i++) {
       remainder_final_buff[i] = image[fist_pxl + i];
     }
     MPI_Send(remainder_final_buff ,remainder_ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
 
-  }
-
-  else{
-    for (int i = 0; i < ncolumn_pxls; i++) {
-      final_buff[i] = image[fist_pxl + i];
-    }
-    MPI_Send(final_buff,ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
   }
 
 }
