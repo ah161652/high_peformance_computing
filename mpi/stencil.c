@@ -207,6 +207,7 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
 
   int start = 1 + (rank * nx);
   int end = start + nx;
+  int remainder_start = start + 1;
   int remainder_end = start + remainder_nx;
 
   if (rank ==0){
@@ -321,16 +322,16 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
     for(int i = 1; i < size - 1; ++i){
       MPI_Recv(final_buff, ncolumn_pxls, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       for (int j = 0; j< ncolumn_pxls; ++j){
-        ///CHANGE
-        final_image[(((nx_mpi*i)+1)*height) + j] = final_buff[j];
+
+        final_image[(ncolumn_pxls*i) + height + j] = final_buff[j];
       }
     }
 
 
     MPI_Recv(remainder_final_buff, remainder_ncolumn_pxls, MPI_FLOAT, size-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     for (int j = 0; j< remainder_ncolumn_pxls; ++j){
-      //CHANGE
-      final_image[(((nx_mpi*(size-1))+1)*height) + j] = remainder_final_buff[j];
+
+      final_image[(ncolumn_pxls*(size-1)) + height + j] = remainder_final_buff[j];
     }
 
   }
