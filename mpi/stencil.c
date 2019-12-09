@@ -216,7 +216,7 @@ void stencil_mpi(const int nx, const int ny, const int width, const int height,
   float calc = 3.0/5.0;
   float calc2 = 0.5/5.0;
 
-  int start = 1 + (rank * nx);
+  int start =  (rank * nx);
   int end = start + nx;
   int remainder_start = width -1 - remainder_nx;
   int remainder_end = remainder_start + remainder_nx;
