@@ -112,8 +112,7 @@ double tic = wtime();
   int nx_mpi;
   int remainder = nx % size;
   int remainder_nx;
-  if (remainder == 0) remainder_nx = nx_mpi;
-  else remainder_nx = remainder;
+
 
   if (remainder == 0){
    nx_mpi = nx/(size);
@@ -122,7 +121,7 @@ double tic = wtime();
 
   else{
     nx_mpi = (nx-remainder) / (size-1);
-    remainder_nx = remainder;
+    remainder_nx = remainder*2;
   }
 
   // Define number of pixels in each column section
