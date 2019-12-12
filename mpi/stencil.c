@@ -325,9 +325,11 @@ else {
 void recombine(int rank, int size, int width, int height, float* final_image, float* image, float* final_buff, int ncolumn_pxls, float* remainder_final_buff, int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl){
   if (rank == 0){
 
-    for (int j = 0; j< width*height; ++j){
-      final_image[j] = image[j];
-    }
+    // for (int j = 0; j< width*height; ++j){
+    //   final_image[j] = image[j];
+    // }
+
+    memcpy(final_image,image,(width*height));
 
 
     for(int i = 1; i < size - 1; ++i){
