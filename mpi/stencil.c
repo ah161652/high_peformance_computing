@@ -19,7 +19,7 @@ double wtime(void);
 void stencil_mpi(const int nx, const int ny, const int width, const int height,
              float* image, float* tmp_image, int rank, int size, int remainder_nx);
 void halo(int rank, float* image, int height, int fist_pxl, int nx_mpi, int ncolumn_pxls, int size, int remainder_nx, int remainder_ncolumn_pxls, int last_col_right_first_pixel, int last_col_left_first_pixel, int first_halo_pixel_right, int first_halo_pixl_left);
-void recombine(int rank, int size, int width, int height, float* final_image, float* image, /*float* final_buff,*/ int ncolumn_pxls, /*float* remainder_final_buff,*/ int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl);
+void recombine(int rank, int size, int width, int height, float* final_image, float* image, int ncolumn_pxls, int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl);
 
 int main(int argc, char* argv[])
 {
@@ -162,17 +162,12 @@ double tic = wtime();
 
 
   //****** Recombine image ******//
-  // float* final_buff = malloc(sizeof(float)*ncolumn_pxls);
-  // float* remainder_final_buff = malloc(sizeof(float)*remainder_ncolumn_pxls);
   float* final_image = malloc(sizeof(float) * width * height);
 
-  recombine(rank, size, width, height, final_image, image, /*final_buff,*/ ncolumn_pxls, /*remainder_final_buff,*/ remainder_ncolumn_pxls, nx_mpi, fist_pxl);
+  recombine(rank, size, width, height, final_image, image, ncolumn_pxls,  remainder_ncolumn_pxls, nx_mpi, fist_pxl);
 
 
   //***********************************//
-
-
-
 
 
   //****** Output Image, time, and free memory ******//
@@ -266,7 +261,7 @@ else{
 void halo(int rank, float* image, int height, int fist_pxl, int nx_mpi, int ncolumn_pxls, int size, int remainder_nx, int remainder_ncolumn_pxls, int last_col_right_first_pixel, int last_col_left_first_pixel, int first_halo_pixel_right, int first_halo_pixl_left)
 {
 
-// float* buff = malloc(height*sizeof(float));
+
 
 if(rank == 0){
 
@@ -275,35 +270,19 @@ if(rank == 0){
                &image[first_halo_pixel_right], height, MPI_FLOAT, rank+1, 0,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-
-                // for (int i = 0; i < height; ++i) {
-                //   image[first_halo_pixel_right + i] = buff[i];
-                // }
-
-                // memcpy(&image[first_halo_pixel_right], buff, (sizeof(float)*height);
-
 }
 
 else if ( rank != size - 1){
-
 
 //Send left, receieve right
 MPI_Sendrecv(&image[last_col_left_first_pixel], height,  MPI_FLOAT, rank - 1, 0,
              &image[first_halo_pixel_right], height, MPI_FLOAT, rank+1, 0,
              MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-             // for (int i = 0; i < height; ++i) {
-             //   image[first_halo_pixel_right + i] = buff[i];
-             // }
-
 // Send right, receieve left
 MPI_Sendrecv(&image[last_col_right_first_pixel], height,  MPI_FLOAT, rank + 1, 0,
              &image[first_halo_pixl_left], height, MPI_FLOAT, rank-1, 0,
              MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-             // for (int i = 0; i < height; ++i) {
-             //   image[first_halo_pixl_left + i] = buff[i];
-             // }
 
 }
 
@@ -314,69 +293,36 @@ else {
                &image[first_halo_pixl_left], height, MPI_FLOAT, rank-1, 0,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-//                for (int i = 0; i < height; ++i) {
-//                  image[first_halo_pixl_left + i] = buff[i];
-// }
-
 }
-
-
-
 
 }
 
 void recombine(int rank, int size, int width, int height, float* final_image, float* image, /*float* final_buff,*/ int ncolumn_pxls, /*float* remainder_final_buff,*/ int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl){
   if (rank == 0){
 
-    // for (int j = 0; j< width*height; ++j){
-    //   final_image[j] = image[j];
-    // }
-
     memcpy(final_image,image,(width*height*sizeof(float)));
 
-
     for(int i = 1; i < size - 1; ++i){
-      MPI_Recv(/*final_buff*/&final_image[(ncolumn_pxls*i) + height], ncolumn_pxls, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      // for (int j = 0; j< ncolumn_pxls; ++j){
-      //
-      //   final_image[(ncolumn_pxls*i) + height + j] = final_buff[j];
-      // }
+      MPI_Recv(&final_image[(ncolumn_pxls*i) + height], ncolumn_pxls, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
     }
 
-
-    MPI_Recv(/*remainder_final_buff*/&final_image[(ncolumn_pxls*(size-1)) + height], remainder_ncolumn_pxls, MPI_FLOAT, size-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    // for (int j = 0; j< remainder_ncolumn_pxls; ++j){
-    //
-    //   final_image[(ncolumn_pxls*(size-1)) + height + j] = remainder_final_buff[j];
-    // }
-
+    MPI_Recv(&final_image[(ncolumn_pxls*(size-1)) + height], remainder_ncolumn_pxls, MPI_FLOAT, size-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
   else if (rank != size -1){
 
-
-    // for (int i = 0; i < ncolumn_pxls; i++) {
-    //   final_buff[i] = image[fist_pxl + i];
-    // }
-    //memcpy(final_buff,&image[fist_pxl], (ncolumn_pxls*sizeof(float)));
     MPI_Send(&image[fist_pxl],ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
-
 
   }
 
   else{
 
-    // for (int i = 0; i < remainder_ncolumn_pxls; i++) {
-    //   remainder_final_buff[i] = image[fist_pxl + i];
-    // }
-    //memcpy(remainder_final_buff, &image[fist_pxl], (remainder_ncolumn_pxls*sizeof(float)));
     MPI_Send(&image[fist_pxl] ,remainder_ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
 
   }
 
 }
-
-
 
 // Create the input image
 void init_image(const int nx, const int ny, const int width, const int height,
