@@ -152,7 +152,7 @@ double tic = wtime();
 
     stencil_mpi(nx_mpi, ny, width, height, tmp_image, image, rank , size, remainder_nx);
 
-    //halo(rank, image, height, fist_pxl, nx_mpi, ncolumn_pxls, size, remainder_nx, remainder_ncolumn_pxls,  last_col_right_first_pixel,  last_col_left_first_pixel,  first_halo_pixel_right,  first_halo_pixl_left);
+    halo(rank, image, height, fist_pxl, nx_mpi, ncolumn_pxls, size, remainder_nx, remainder_ncolumn_pxls,  last_col_right_first_pixel,  last_col_left_first_pixel,  first_halo_pixel_right,  first_halo_pixl_left);
 
   }
   MPI_Barrier(MPI_COMM_WORLD);
