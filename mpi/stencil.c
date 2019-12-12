@@ -162,11 +162,11 @@ double tic = wtime();
 
 
   //****** Recombine image ******//
-  float* final_buff = malloc(sizeof(float)*ncolumn_pxls);
-  float* remainder_final_buff = malloc(sizeof(float)*remainder_ncolumn_pxls);
+  // float* final_buff = malloc(sizeof(float)*ncolumn_pxls);
+  // float* remainder_final_buff = malloc(sizeof(float)*remainder_ncolumn_pxls);
   float* final_image = malloc(sizeof(float) * width * height);
 
-  recombine(rank, size, width, height, final_image, image, final_buff, ncolumn_pxls, remainder_final_buff, remainder_ncolumn_pxls, nx_mpi, fist_pxl);
+  recombine(rank, size, width, height, final_image, image, /*final_buff,*/ ncolumn_pxls, /*remainder_final_buff,*/ remainder_ncolumn_pxls, nx_mpi, fist_pxl);
 
 
   //***********************************//
@@ -266,7 +266,7 @@ else{
 void halo(int rank, float* image, int height, int fist_pxl, int nx_mpi, int ncolumn_pxls, int size, int remainder_nx, int remainder_ncolumn_pxls, int last_col_right_first_pixel, int last_col_left_first_pixel, int first_halo_pixel_right, int first_halo_pixl_left)
 {
 
-float* buff = malloc(height*sizeof(float));
+// float* buff = malloc(height*sizeof(float));
 
 if(rank == 0){
 
@@ -325,7 +325,7 @@ else {
 
 }
 
-void recombine(int rank, int size, int width, int height, float* final_image, float* image, float* final_buff, int ncolumn_pxls, float* remainder_final_buff, int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl){
+void recombine(int rank, int size, int width, int height, float* final_image, float* image, /*float* final_buff,*/ int ncolumn_pxls, /*float* remainder_final_buff,*/ int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl){
   if (rank == 0){
 
     // for (int j = 0; j< width*height; ++j){
