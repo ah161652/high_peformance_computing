@@ -342,20 +342,21 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
     }
 
 
-    MPI_Recv(remainder_final_buff, remainder_ncolumn_pxls, MPI_FLOAT, size-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    for (int j = 0; j< remainder_ncolumn_pxls; ++j){
-
-      final_image[(ncolumn_pxls*(size-1)) + height + j] = remainder_final_buff[j];
-    }
+    MPI_Recv(/*remainder_final_buff*/&final_image[(ncolumn_pxls*(size-1)) + height], remainder_ncolumn_pxls, MPI_FLOAT, size-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    // for (int j = 0; j< remainder_ncolumn_pxls; ++j){
+    //
+    //   final_image[(ncolumn_pxls*(size-1)) + height + j] = remainder_final_buff[j];
+    // }
 
   }
 
   else if (rank != size -1){
 
 
-    for (int i = 0; i < ncolumn_pxls; i++) {
-      final_buff[i] = image[fist_pxl + i];
-    }
+    // for (int i = 0; i < ncolumn_pxls; i++) {
+    //   final_buff[i] = image[fist_pxl + i];
+    // }
+    memcpy(&final_buff,&image[fist_pxl], ncolumn_pxls]);
     MPI_Send(final_buff,ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
 
 
@@ -363,9 +364,10 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
 
   else{
 
-    for (int i = 0; i < remainder_ncolumn_pxls; i++) {
-      remainder_final_buff[i] = image[fist_pxl + i];
-    }
+    // for (int i = 0; i < remainder_ncolumn_pxls; i++) {
+    //   remainder_final_buff[i] = image[fist_pxl + i];
+    // }
+    memcpy(&remainder_final_buff, &image[fist_pxl], remainder_ncolumn_pxls);
     MPI_Send(remainder_final_buff ,remainder_ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
 
   }
