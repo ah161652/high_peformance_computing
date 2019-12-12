@@ -19,7 +19,7 @@ double wtime(void);
 void stencil_mpi(const int nx, const int ny, const int width, const int height,
              float* image, float* tmp_image, int rank, int size, int remainder_nx);
 void halo(int rank, float* image, int height, int fist_pxl, int nx_mpi, int ncolumn_pxls, int size, int remainder_nx, int remainder_ncolumn_pxls, int last_col_right_first_pixel, int last_col_left_first_pixel, int first_halo_pixel_right, int first_halo_pixl_left);
-void recombine(int rank, int size, int width, int height, float* final_image, float* image, float* final_buff, int ncolumn_pxls, float* remainder_final_buff, int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl);
+void recombine(int rank, int size, int width, int height, float* final_image, float* image, /*float* final_buff,*/ int ncolumn_pxls, /*float* remainder_final_buff,*/ int remainder_ncolumn_pxls, int nx_mpi, int fist_pxl);
 
 int main(int argc, char* argv[])
 {
