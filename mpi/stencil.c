@@ -364,10 +364,10 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
 
   else{
 
-    for (int i = 0; i < remainder_ncolumn_pxls; i++) {
-      remainder_final_buff[i] = image[fist_pxl + i];
-    }
-    // memcpy(remainder_final_buff, &image[fist_pxl], remainder_ncolumn_pxls);
+    // for (int i = 0; i < remainder_ncolumn_pxls; i++) {
+    //   remainder_final_buff[i] = image[fist_pxl + i];
+    // }
+    memcpy(remainder_final_buff, &image[fist_pxl], remainder_ncolumn_pxls);
     MPI_Send(remainder_final_buff ,remainder_ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
 
   }
