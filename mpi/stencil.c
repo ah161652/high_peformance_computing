@@ -272,13 +272,15 @@ if(rank == 0){
 
   // Send right, receieve right, place in right halo column
   MPI_Sendrecv(&image[last_col_right_first_pixel], height,  MPI_FLOAT, rank + 1, 0,
-               buff, height, MPI_FLOAT, rank+1, 0,
+               &image[first_halo_pixel_right], height, MPI_FLOAT, rank+1, 0,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 
-                for (int i = 0; i < height; ++i) {
-                  image[first_halo_pixel_right + i] = buff[i];
-                }
+                // for (int i = 0; i < height; ++i) {
+                //   image[first_halo_pixel_right + i] = buff[i];
+                // }
+
+                // memcpy(&image[first_halo_pixel_right], buff, (sizeof(float)*height);
 
 }
 
@@ -287,21 +289,21 @@ else if ( rank != size - 1){
 
 //Send left, receieve right, place in right halo column
 MPI_Sendrecv(&image[last_col_left_first_pixel], height,  MPI_FLOAT, rank - 1, 0,
-             buff, height, MPI_FLOAT, rank+1, 0,
+             &image[first_halo_pixel_right], height, MPI_FLOAT, rank+1, 0,
              MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-             for (int i = 0; i < height; ++i) {
-               image[first_halo_pixel_right + i] = buff[i];
-             }
+             // for (int i = 0; i < height; ++i) {
+             //   image[first_halo_pixel_right + i] = buff[i];
+             // }
 
 // Send right, receieve left, place in left halo column
 MPI_Sendrecv(&image[last_col_right_first_pixel], height,  MPI_FLOAT, rank + 1, 0,
-             buff, height, MPI_FLOAT, rank-1, 0,
+             &image[first_halo_pixl_left], height, MPI_FLOAT, rank-1, 0,
              MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-             for (int i = 0; i < height; ++i) {
-               image[first_halo_pixl_left + i] = buff[i];
-             }
+             // for (int i = 0; i < height; ++i) {
+             //   image[first_halo_pixl_left + i] = buff[i];
+             // }
 
 }
 
@@ -309,12 +311,12 @@ else {
 
   // Send left, recieve left, place in left halo column
   MPI_Sendrecv(&image[last_col_left_first_pixel], height,  MPI_FLOAT, rank - 1, 0,
-               buff, height, MPI_FLOAT, rank-1, 0,
+               &image[first_halo_pixel_left], height, MPI_FLOAT, rank-1, 0,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-               for (int i = 0; i < height; ++i) {
-                 image[first_halo_pixl_left + i] = buff[i];
-}
+//                for (int i = 0; i < height; ++i) {
+//                  image[first_halo_pixl_left + i] = buff[i];
+// }
 
 }
 
