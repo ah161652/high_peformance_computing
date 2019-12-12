@@ -334,7 +334,7 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
 
 
     for(int i = 1; i < size - 1; ++i){
-      MPI_Recv(/*final_buff*/&final_image[(ncolumn_pxls*i) + height + j], ncolumn_pxls, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(/*final_buff*/&final_image[(ncolumn_pxls*i) + height], ncolumn_pxls, MPI_FLOAT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       // for (int j = 0; j< ncolumn_pxls; ++j){
       //
       //   final_image[(ncolumn_pxls*i) + height + j] = final_buff[j];
