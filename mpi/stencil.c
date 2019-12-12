@@ -330,7 +330,7 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
     //   final_image[j] = image[j];
     // }
 
-    memcpy(final_image,image,(width*height));
+    memcpy(final_image,image,(width*height*sizeof(float)));
 
 
     for(int i = 1; i < size - 1; ++i){
@@ -367,7 +367,7 @@ void recombine(int rank, int size, int width, int height, float* final_image, fl
     // for (int i = 0; i < remainder_ncolumn_pxls; i++) {
     //   remainder_final_buff[i] = image[fist_pxl + i];
     // }
-    memcpy(remainder_final_buff, &image[fist_pxl], remainder_ncolumn_pxls);
+    memcpy(remainder_final_buff, &image[fist_pxl], (remainder_ncolumn_pxls*sizeof(float)));
     MPI_Send(remainder_final_buff ,remainder_ncolumn_pxls, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
 
   }
